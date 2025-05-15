@@ -1,10 +1,19 @@
 <?php
 session_start();
-// 1) Validación de sesión y rol
-if (!isset($_SESSION['user_id']) || $_SESSION['user_acceso'] !== 'admin') {
-    header('Location: login.php');
+
+// 1) Validación de sesión
+if (!isset($_SESSION['user_id'])) {
+    header('Location: login.php?session_expired=true');
     exit;
 }
+// 2) Validación de rol (Opcional, descomentar y adaptar si es necesario)
+// El valor 'admin' debe coincidir con un valor en la columna ModuloAcceso de tblregistrodeempleados
+/*
+if (!isset($_SESSION['user_acceso']) || $_SESSION['user_acceso'] !== 'admin') {
+    header('Location: login.php?unauthorized=true'); // O a una página de "acceso denegado"
+    exit;
+}
+*/
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -44,7 +53,8 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_acceso'] !== 'admin') {
     }
     .navbar-fixed-top .navbar-brand {
         height: var(--navbar-height) !important; font-size: 16px;
-        margin-left: 5px !important; padding-left: 10px; padding-right: 10px;
+        /* No margin-left aquí, se controla con flex */
+        padding-left: 10px; padding-right: 10px;
     }
     .navbar-fixed-top .nav > li > a i { line-height: var(--navbar-height); }
 
@@ -96,23 +106,26 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_acceso'] !== 'admin') {
     }
     body.sidebar-mobile-shown .sidebar-overlay { display: block; }
 
-    #sidebarToggleDesktop {
-        color: white; font-size: 1.2em; padding: 0 10px;
-        margin-left: 10px; background: transparent; border: none;
-        line-height: var(--navbar-height);
-        float:left;
-    }
-    #sidebarToggleDesktop:hover { background-color: rgba(255,255,255,0.1); }
-
-    #sidebarToggleMobile {
-        color: white; font-size: 1.3em; padding: 0 15px;
-        display: none;
+    /* --- BOTONES DE TOGGLE --- */
+    #sidebarToggleDesktop, #sidebarToggleMobile {
+        color: white; font-size: 1.3em; /* Aumentar un poco si es necesario */
+        padding: 0 15px; /* Ajustar padding */
         line-height: var(--navbar-height);
         background: transparent; border: none;
     }
-     #sidebarToggleMobile:hover, #sidebarToggleMobile:focus { background-color: rgba(255,255,255,0.1); color:white; }
+    #sidebarToggleDesktop:hover, #sidebarToggleMobile:hover,
+    #sidebarToggleDesktop:focus, #sidebarToggleMobile:focus {
+        background-color: rgba(255,255,255,0.1); color:white;
+    }
 
-    @media (min-width: 768px) {
+    #sidebarToggleDesktop { /* Para escritorio, puede ir a la izquierda del brand */
+        float:left; /* O usar flex order si el navbar-header es flex */
+        margin-right: 10px; /* Espacio entre toggle y brand */
+    }
+
+
+    /* --- ESTILOS ESPECÍFICOS PARA NAVBAR Y MÓVIL --- */
+    @media (min-width: 768px) { /* ESCRITORIO */
       .sidebar {
           position: relative !important; left: auto !important; top: auto !important;
           height: auto !important; padding-top: 0 !important; z-index: 1000 !important;
@@ -122,9 +135,11 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_acceso'] !== 'admin') {
       #sidebarToggleDesktop { display: block !important; }
       #sidebarToggleMobile { display: none !important; }
       .navbar-fixed-top .navbar-right > li > a > span { display: inline-block; }
+      .navbar-fixed-top .nav.navbar-nav.navbar-right { display: flex !important; } /* Asegurar que se muestre en escritorio */
+
     }
 
-    @media (max-width: 767px) {
+    @media (max-width: 767px) { /* MÓVIL */
       .sidebar {
         position: fixed !important;
         left: calc(-1 * var(--mobile-sidebar-visible-width) - 10px) !important;
@@ -139,14 +154,46 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_acceso'] !== 'admin') {
       .sidebar.sidebar-mobile-visible .nav-link { justify-content: flex-start; }
       .sidebar.sidebar-mobile-visible .nav-link i { font-size: 1.1em; margin-right: 10px;}
       .content { margin-left: 0 !important; padding: 15px; }
-      .navbar-fixed-top .container-fluid {
-          display: flex; justify-content: space-between; align-items: center;
-          padding-left: 5px; padding-right: 5px;
+
+      .navbar-fixed-top .container-fluid { /* Convertir en Flex container */
+          display: flex;
+          justify-content: space-between; /* Distribuye espacio: toggle izq, brand centro, user der */
+          align-items: center;
+          padding-left: 5px; padding-right: 5px; /* Reducir padding si es necesario */
       }
-       .navbar-fixed-top .navbar-brand { flex-grow: 1; }
+
       #sidebarToggleDesktop { display: none !important; }
-      #sidebarToggleMobile { display: block !important; }
-      .navbar-fixed-top .nav.navbar-nav.navbar-right { display: none; }
+      #sidebarToggleMobile {
+          display: block !important;
+          order: -1; /* Mueve el botón de hamburguesa al principio del contenedor flex */
+          margin-right: 10px; /* Espacio entre hamburguesa y brand */
+      }
+
+      .navbar-fixed-top .navbar-brand {
+          flex-grow: 1; /* Permite que el brand ocupe el espacio disponible */
+          text-align: center; /* Centra el texto del brand si es necesario */
+          margin-left: 0 !important; /* Quitar margen izquierdo */
+          padding-left: 0; /* Ajustar padding si es necesario */
+      }
+      .navbar-fixed-top .navbar-nav.navbar-right { /* Elementos de la derecha */
+          display: flex !important; /* Asegurar que se muestren en móvil también si así se desea */
+          flex-shrink: 0; /* Evita que se encojan demasiado */
+      }
+      /* Ocultar el texto del nombre de usuario en móviles si es muy largo */
+      .navbar-fixed-top .navbar-right > li > a > span {
+          display: none; /* Ocultar texto de usuario en móviles */
+      }
+      /* Mostrar solo el icono del usuario en móviles */
+       .navbar-fixed-top .navbar-right > li > a > i.icon-user {
+          font-size: 1.2em; /* Ajustar tamaño si es necesario */
+      }
+      /* Si también quieres ocultar el texto "Cerrar sesión" y dejar solo el icono */
+       .navbar-fixed-top .navbar-right > li > a > i.icon-switch2 + span {
+          display: none;
+      }
+       .navbar-fixed-top .navbar-right > li > a > i.icon-switch2 {
+           font-size: 1.2em;
+       }
     }
   </style>
 </head>
@@ -156,24 +203,22 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_acceso'] !== 'admin') {
   <div class="wrapper">
     <nav class="navbar navbar-inverse navbar-fixed-top">
       <div class="container-fluid">
-        <button type="button" id="sidebarToggleDesktop">
-            <i class="icon-paragraph-justify3"></i>
-        </button>
-        <a class="navbar-brand" href="#">MiMarca</a>
-
-        <button type="button" id="sidebarToggleMobile">
-            <i class="icon-menu"></i>
+        <button type="button" id="sidebarToggleMobile"> <i class="icon-menu"></i>
         </button>
 
-        <ul class="nav navbar-nav navbar-right">
-          <li><a href="#"><i class="icon-user"></i><span><?php echo htmlspecialchars($_SESSION['user_name']); ?></span></a></li>
-          <li><a href="login.php?logout=true"><i class="icon-switch2"></i> <span>Cerrar sesión</span></a></li>
+        <button type="button" id="sidebarToggleDesktop"> <i class="icon-paragraph-justify3"></i>
+        </button>
+
+        <a class="navbar-brand" href="#">Envios de cargas</a> <ul class="nav navbar-nav navbar-right">
+          <li><a href="#"><i class="icon-user"></i><span><?php echo isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'Usuario'; ?></span></a></li>
+          <li><a href="logout.php"><i class="icon-switch2"></i> <span>Cerrar sesión</span></a></li>
         </ul>
       </div>
     </nav>
 
     <div class="main">
-      <nav id="sidebar" class="sidebar collapsed"> <ul class="nav">
+      <nav id="sidebar" class="sidebar collapsed">
+        <ul class="nav">
           <li class="nav-item"><a class="nav-link" href="dashboard.php"><i class="icon-home4"></i><span>Dashboard</span></a></li>
           <li class="nav-item"><a class="nav-link" href="produccion.php"><i class="icon-stack"></i><span>Produccion</span></a></li>
           <li class="nav-item"><a class="nav-link" href="compras.php"><i class="icon-cart5"></i><span>COMPRAS</span></a></li>
@@ -187,7 +232,8 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_acceso'] !== 'admin') {
       </nav>
 
       <section class="content">
-        </section>
+        <p>Cargando contenido inicial...</p>
+      </section>
     </div>
   </div>
 
