@@ -13,7 +13,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_acceso'] !== 'admin') {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MiMarca</title>
 
-  <link rel="stylesheet" href="bootstrap.css"> <link rel="stylesheet" href="icomoon/styles.css"> <style>
+  <link rel="stylesheet" href="Css/bootstrap.css"> <link rel="stylesheet" href="Css/icomoon/styles.css"> <style>
     :root {
       --sidebar-width: 260px;
       --sidebar-collapsed-width: 60px;
