@@ -79,15 +79,15 @@ try {
                     <?php if (empty($productos) && !$error_db): ?>
                         <div class="alert alert-info">No se encontraron productos que contengan la palabra "Quality" o no hay productos registrados.</div>
                     <?php elseif (!empty($productos)): ?>
-                        <form id="formProduccion">
+                        <form id="formProduccion" action="guardar_produccion.php" method="post">
                             <div class="table-responsive">
                                 <table class="table table-bordered table-hover table-striped">
                                     <thead>
                                         <tr>
-                                            <th>Código</th>
+                                            <th class="text-center" style="width: 120px;">Producción</th>
                                             <th>Descripción</th>
                                             <th class="text-right d-none d-md-table-cell">Unidades (Paquete)</th>
-                                            <th class="text-center" style="width: 120px;">Producción</th>
+                                            <th>Código</th>
                                             <th class="text-center d-none d-md-table-cell" style="width: 100px;">Acción</th>
                                         </tr>
                                     </thead>
@@ -99,11 +99,6 @@ try {
                                                 data-descripcion="<?php echo htmlspecialchars($producto['Descripcion']); ?>"
                                                 data-unidades="<?php echo htmlspecialchars($producto['Unidades']); ?>">
 
-                                                <td><?php echo htmlspecialchars($producto['CodigoPROD']); ?></td>
-                                                <td class="descripcion-producto">
-                                                    <?php echo htmlspecialchars($producto['Descripcion']); ?>
-                                                </td>
-                                                <td class="text-right d-none d-md-table-cell"><?php echo htmlspecialchars($producto['Unidades']); ?></td>
                                                 <td class="text-center">
                                                     <span class="display-produccion-<?php echo htmlspecialchars($producto['CodigoPROD']); ?>">0</span>
                                                     <input
@@ -113,6 +108,11 @@ try {
                                                         id="input-produccion-<?php echo htmlspecialchars($producto['CodigoPROD']); ?>"
                                                         value="0">
                                                 </td>
+                                                <td class="descripcion-producto">
+                                                    <?php echo htmlspecialchars($producto['Descripcion']); ?>
+                                                </td>
+                                                <td class="text-right d-none d-md-table-cell"><?php echo htmlspecialchars($producto['Unidades']); ?></td>
+                                                <td><?php echo htmlspecialchars($producto['CodigoPROD']); ?></td>
                                                 <td class="text-center d-none d-md-table-cell">
                                                     <button type="button"
                                                             class="btn btn-xs btn-info btn-registrar-produccion-desktop"
@@ -126,7 +126,9 @@ try {
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="text-right mt-3"> <button type="submit" class="btn btn-primary">Guardar Toda la Producción</button>
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <div>Total registradas: <strong><span id="conteoProduccion">0</span></strong></div>
+                                <button type="submit" class="btn btn-primary">Guardar Toda la Producción</button>
                             </div>
                         </form>
                     <?php endif; ?>

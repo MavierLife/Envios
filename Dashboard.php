@@ -1,6 +1,28 @@
 <?php
 session_start();
 
+// --- MOVER CONTEO ANTES DEL GUARDIA AJAX ---
+$csvFiles = glob(__DIR__ . '/ProdPendientes/*.csv');
+$validacionesPendiente = $csvFiles ? count($csvFiles) : 0;
+
+// Calcular unidades totales pendientes
+$unidadesPendientes = 0;
+foreach ($csvFiles as $file) {
+    if (($handle = fopen($file, 'r')) !== false) {
+        $headers   = fgetcsv($handle);
+        $prodIndex = $headers ? array_search('Produccion', $headers) : false;
+        if ($prodIndex !== false) {
+            while (($row = fgetcsv($handle)) !== false) {
+                $unidadesPendientes += isset($row[$prodIndex])
+                    ? (int) $row[$prodIndex]
+                    : 0;
+            }
+        }
+        fclose($handle);
+    }
+}
+// ---------------------------------------------
+
 // --- INICIO DE LA MODIFICACIÓN PARA OPCIÓN 1 ---
 // Si no es una solicitud AJAX Y se accede directamente a este archivo
 if (empty($_SERVER['HTTP_X_REQUESTED_WITH']) || strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) != 'xmlhttprequest') {
@@ -25,6 +47,7 @@ if (!isset($_SESSION['user_acceso']) || $_SESSION['user_acceso'] !== 'rol_para_d
     exit;
 }
 */
+
 ?>
 
 <div class="container-fluid">
@@ -40,11 +63,12 @@ if (!isset($_SESSION['user_acceso']) || $_SESSION['user_acceso'] !== 'rol_para_d
                 <div class="panel-heading">
                     <div class="row">
                         <div class="col-xs-3">
-                            <i class="icon-cart5 fa-5x"></i>
+                            <!-- Antes: <i class="icon-cart5 fa-5x"></i> -->
+                            <i class="icon-stack-check fa-5x"></i>  <!-- Validaciones pendientes -->
                         </div>
                         <div class="col-xs-9 text-right">
-                            <div class="huge">26</div>
-                            <div>Nuevas Órdenes!</div>
+                            <div class="huge"><?php echo $validacionesPendiente; ?></div>
+                            <div>Validaciones pendiente</div>
                         </div>
                     </div>
                 </div>
@@ -62,11 +86,12 @@ if (!isset($_SESSION['user_acceso']) || $_SESSION['user_acceso'] !== 'rol_para_d
                 <div class="panel-heading">
                     <div class="row">
                         <div class="col-xs-3">
-                            <i class="icon-stats-dots fa-5x"></i>
+                            <!-- Antes: <i class="icon-stats-dots fa-5x"></i> -->
+                            <i class="icon-stats-bars fa-5x"></i>   <!-- Unidades totales pendientes -->
                         </div>
                         <div class="col-xs-9 text-right">
-                            <div class="huge">12</div>
-                            <div>Nuevas Tareas!</div>
+                            <div class="huge"><?php echo $unidadesPendientes; ?></div>
+                            <div>Unidades totales pendientes</div>
                         </div>
                     </div>
                 </div>
@@ -85,7 +110,10 @@ if (!isset($_SESSION['user_acceso']) || $_SESSION['user_acceso'] !== 'rol_para_d
         <div class="col-lg-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title"><i class="icon-clock"></i> Actividad Reciente</h3>
+                    <h3 class="panel-title">
+                        <!-- Mantener icon-clock para actividad reciente -->
+                        <i class="icon-clock fa-lg"></i> Actividad Reciente
+                    </h3>
                 </div>
                 <div class="panel-body">
                     <p>Aquí iría la actividad reciente del sistema o más gráficos.</p>

@@ -220,7 +220,7 @@ if (!isset($_SESSION['user_acceso']) || $_SESSION['user_acceso'] !== 'admin') {
       <nav id="sidebar" class="sidebar collapsed">
         <ul class="nav">
           <li class="nav-item"><a class="nav-link" href="dashboard.php"><i class="icon-home4"></i><span>Dashboard</span></a></li>
-          <li class="nav-item"><a class="nav-link" href="produccion.php"><i class="icon-stack"></i><span>Produccion</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="Produccion.php"><i class="icon-stack"></i><span>Produccion</span></a></li>
           <li class="nav-item"><a class="nav-link" href="compras.php"><i class="icon-cart5"></i><span>COMPRAS</span></a></li>
           <li class="nav-item"><a class="nav-link" href="facturacion.php"><i class="icon-file-text2"></i><span>FACTURACION</span></a></li>
           <li class="nav-item"><a class="nav-link" href="creditos.php"><i class="icon-credit-card"></i><span>CREDITOS</span></a></li>

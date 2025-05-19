@@ -2,7 +2,6 @@ $(document).ready(function() {
     inicializarModal();
     manejarClicDescripcionEnMovil();
     manejarGuardadoEnModal();
-    manejarEnvioFormulario();
 });
 
 
@@ -76,36 +75,31 @@ function manejarGuardadoEnModal() {
 }
 
 
-// ESTO MANEJA EL ENVÍO DEL FORMULARIO: valida y prepara los datos para enviar
-function manejarEnvioFormulario() {
-    $('#formProduccion').on('submit', function(e) {
-        e.preventDefault();
-
-        var datosArray = $(this).serializeArray();
-        var produccionData = {};
-
-        datosArray.forEach(function(item) {
-            var match = item.name.match(/produccion\[(.*?)\]/);
-            if (match && match[1]) {
-                var val = parseFloat(item.value);
-                if (!isNaN(val) && val >= 0) {
-                    produccionData[match[1]] = val;
-                }
-            }
-        });
-
-        if (Object.keys(produccionData).length === 0) {
-            alert('No hay datos de producción para guardar.');
-            return;
-        }
-
-        console.log('Datos de producción a enviar:', produccionData);
-        alert('Función de guardado aún no implementada en backend. Revisa consola.');
-        // Aquí iría la llamada AJAX al servidor:
-        /*
-        $.post('procesar_produccion.php', { produccion: produccionData }, function(respuesta) {
-            // manejar respuesta...
-        }, 'json');
-        */
+// recalcula el total de producción registrada
+function actualizarTotal() {
+    const inputs = document.querySelectorAll('.produccion-hidden-input');
+    let total = 0;
+    inputs.forEach(i => {
+        total += parseInt(i.value, 10) || 0;
     });
+    document.getElementById('conteoProduccion').textContent = total;
 }
+
+// al iniciar, muestra el total (0 o lo que haya)
+document.addEventListener('DOMContentLoaded', actualizarTotal);
+
+// en tu handler de guardar en modal (ejemplo):
+document.getElementById('btnGuardarProduccionModal').addEventListener('click', function() {
+    const codigo = document.getElementById('modalCodigoProdHidden').value;
+    const cantidad = parseInt(document.getElementById('modalCantidadProducida').value, 10) || 0;
+
+    // actualiza el span y el input hidden
+    document.querySelector('.display-produccion-' + codigo).textContent = cantidad;
+    document.getElementById('input-produccion-' + codigo).value = cantidad;
+
+    // recalcula total
+    actualizarTotal();
+
+    // cierra modal
+    $('#produccionModal').modal('hide');
+});
