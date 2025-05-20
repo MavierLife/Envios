@@ -20,7 +20,7 @@ if (!isset($_SESSION['user_acceso']) || $_SESSION['user_acceso'] !== 'admin') {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MiMarca</title>
+  <title>HelenStock</title>
 
   <link rel="stylesheet" href="Css/bootstrap.css">
   <link rel="stylesheet" href="Css/icomoon/styles.css">
@@ -209,7 +209,7 @@ if (!isset($_SESSION['user_acceso']) || $_SESSION['user_acceso'] !== 'admin') {
         <button type="button" id="sidebarToggleDesktop"> <i class="icon-paragraph-justify3"></i>
         </button>
 
-        <a class="navbar-brand" href="#">Envios de cargas</a> <ul class="nav navbar-nav navbar-right">
+        <a class="navbar-brand" href="#">HelenStock</a> <ul class="nav navbar-nav navbar-right">
           <li><a href="#"><i class="icon-user"></i><span><?php echo isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'Usuario'; ?></span></a></li>
           <li><a href="logout.php"><i class="icon-switch2"></i> <span>Cerrar sesión</span></a></li>
         </ul>
@@ -219,8 +219,12 @@ if (!isset($_SESSION['user_acceso']) || $_SESSION['user_acceso'] !== 'admin') {
     <div class="main">
       <nav id="sidebar" class="sidebar collapsed">
         <ul class="nav">
-          <li class="nav-item"><a class="nav-link" href="dashboard.php"><i class="icon-home4"></i><span>Dashboard</span></a></li>
-          <li class="nav-item"><a class="nav-link" href="Produccion.php"><i class="icon-stack"></i><span>Produccion</span></a></li>
+          <li class="nav-item">
+            <a class="nav-link" href="dashboard"><i class="icon-home4"></i><span>Dashboard</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="produccion"><i class="icon-stack"></i><span>Producción</span></a>
+          </li>
           <li class="nav-item"><a class="nav-link" href="compras.php"><i class="icon-cart5"></i><span>COMPRAS</span></a></li>
           <li class="nav-item"><a class="nav-link" href="facturacion.php"><i class="icon-file-text2"></i><span>FACTURACION</span></a></li>
           <li class="nav-item"><a class="nav-link" href="creditos.php"><i class="icon-credit-card"></i><span>CREDITOS</span></a></li>

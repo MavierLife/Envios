@@ -65,6 +65,6 @@ foreach ($produccion as $codigo => $cantidad) {
 }
 fclose($fp);
 
-// Redirigir de vuelta con indicador de éxito
-header('Location: index.php?guardado=ok');
+// Redirigir de vuelta a Producción dentro del SPA
+header('Location: Produccion.php?guardado=ok');
 exit;

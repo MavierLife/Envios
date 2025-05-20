@@ -1,0 +1,17 @@
+DirectoryIndex Dashboard.php index.php
+
+RewriteEngine On
+RewriteBase /Envios/
+
+# 2) Si no existe el archivo o directorio solicitado...
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# 3) Raíz /Envios/ → dashboard
+RewriteRule ^$ dashboard [L,QSA]
+
+# 3.1) URL limpia /dashboard → Dashboard.php
+RewriteRule ^dashboard/?$ Dashboard.php [L,QSA,NC]
+
+# 4) Rutas “limpias”: /página → página.php
+RewriteRule ^([^/.]+)/?$ $1.php [L,QSA]

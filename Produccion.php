@@ -198,8 +198,11 @@ try {
        clases como 'hidden-xs hidden-sm' en las th/td que quieres ocultar en móvil.
     */
 
+    /* SweetAlert2 */
 </style>
 
-
-   <script src="js/produccion.js"></script>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Tu lógica de producción -->
+    <script src="js/produccion.js?v=<?php echo time(); ?>"></script>
 

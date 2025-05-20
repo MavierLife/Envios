@@ -4,9 +4,9 @@ require_once 'Config/Database.php';
 
 $message = '';
 
-// If user is already logged in, redirect to index.php
+// If user is already logged in, redirect to dashboard
 if (isset($_SESSION['user_id'])) {
-    header('Location: index.php');
+    header('Location: index.php#dashboard'); // MODIFICADO AQUÍ
     exit;
 }
 
@@ -43,15 +43,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // Verify password using password_verify since ClaveAcceso is a bcrypt hash
             // This information is from your request and confirmed by helensystem_data.sql structure for ClaveAcceso
             if (password_verify($password, $row['ClaveAcceso'])) {
-                $_SESSION['user_id'] = $row['UUIDEmpleado'];
-                $_SESSION['user_name'] = $row['Nombres'] . ' ' . $row['Apellidos'];
-                $_SESSION['user_code'] = $row['CodigoEMP'];
-                $_SESSION['user_acceso'] = $row['ModuloAcceso']; // Storing access level from db
-
                 // Regenerate session ID for security
                 session_regenerate_id(true);
 
-                header('Location: index.php');
+                $_SESSION['user_id']   = $row['UUIDEmpleado'];
+                $_SESSION['user_name'] = $row['Nombres'] . ' ' . $row['Apellidos'];
+                $_SESSION['user_code'] = $row['CodigoEMP'];
+                $_SESSION['user_acceso']= $row['ModuloAcceso'];
+
+                header('Location: index.php#dashboard'); // MODIFICADO AQUÍ
                 exit;
             } else {
                 $message = 'La contraseña ingresada es incorrecta.';

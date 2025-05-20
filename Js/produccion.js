@@ -2,6 +2,44 @@ $(document).ready(function() {
     inicializarModal();
     manejarClicDescripcionEnMovil();
     manejarGuardadoEnModal();
+    // recalcula el total al cargar
+    actualizarTotal();
+
+    // Muestra confirmación si venimos de un guardado exitoso
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('guardado') === 'ok') {
+        Swal.fire({
+            icon: 'success',
+            title: 'Registro exitoso',
+            text: 'El archivo se creó correctamente.'
+        });
+    }
+
+    // valida y pide confirmación antes de enviar
+    $('#formProduccion').on('submit', function(e) {
+        e.preventDefault();
+        var total = parseInt($('#conteoProduccion').text(), 10) || 0;
+        if (total <= 0) {
+            Swal.fire({
+                icon: 'error',
+                title: '¡Error!',
+                text: 'Debes registrar al menos una producción antes de guardar.'
+            });
+            return;
+        }
+        Swal.fire({
+            icon: 'question',
+            title: 'Confirmar registro',
+            text: '¿Desea registrar la producción?',
+            showCancelButton: true,
+            confirmButtonText: 'Sí',
+            cancelButtonText: 'No'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                this.submit();
+            }
+        });
+    });
 });
 
 
@@ -86,7 +124,20 @@ function actualizarTotal() {
 }
 
 // al iniciar, muestra el total (0 o lo que haya)
-document.addEventListener('DOMContentLoaded', actualizarTotal);
+document.addEventListener('DOMContentLoaded', function() {
+  var form = document.getElementById('formProduccion');
+  form.addEventListener('submit', function(e) {
+    var total = parseInt(document.getElementById('conteoProduccion').innerText, 10) || 0;
+    if (total <= 0) {
+      e.preventDefault();
+      Swal.fire({
+        icon: 'error',
+        title: '¡Error!',
+        text: 'Debes registrar al menos una producción antes de guardar.'
+      });
+    }
+  });
+});
 
 // en tu handler de guardar en modal (ejemplo):
 document.getElementById('btnGuardarProduccionModal').addEventListener('click', function() {
