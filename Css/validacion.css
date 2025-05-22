@@ -1,0 +1,20 @@
+.table-responsive {
+  margin-top: 1rem;
+}
+
+.table th, .table td {
+  vertical-align: middle;
+}
+
+.btn-xs {
+  padding: .25rem .5rem;
+  font-size: .75rem;
+}
+
+/* Ajustes para móvil */
+@media (max-width: 576px) {
+  .table-responsive {
+    font-size: .85rem;
+  }
+  .btn-xs { font-size: .65rem; }
+}
