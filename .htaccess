@@ -1,17 +1,32 @@
-DirectoryIndex Dashboard.php index.php
+Options +FollowSymLinks -MultiViews
+DirectoryIndex index.php Dashboard.php
 
 RewriteEngine On
 RewriteBase /Envios/
 
-# 2) Si no existe el archivo o directorio solicitado...
+# Regla 1: Para la raíz (/Envios/)
+# Si la solicitud es para el directorio base y no es un archivo o directorio existente
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^/?$ Dashboard.php [L]
+# Dashboard.php (con la corrección PHP que hicimos) redirigirá a index.php#dashboard
 
-# 3) Raíz /Envios/ → dashboard
-RewriteRule ^$ dashboard [L,QSA]
+# Regla 2: Para /dashboard -> Dashboard.php
+# Si la solicitud es para "dashboard" y Dashboard.php existe
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI}/../Dashboard.php -f [OR] # Si .htaccess está en subdirectorio de Envios
+RewriteCond %{DOCUMENT_ROOT}/Envios/Dashboard.php -f # Si .htaccess está en DocumentRoot
+RewriteRule ^dashboard/?$ Dashboard.php [NC,L]
+# Dashboard.php (con la corrección PHP) redirigirá a index.php#dashboard
 
-# 3.1) URL limpia /dashboard → Dashboard.php
-RewriteRule ^dashboard/?$ Dashboard.php [L,QSA,NC]
-
-# 4) Rutas “limpias”: /página → página.php
-RewriteRule ^([^/.]+)/?$ $1.php [L,QSA]
+# Regla 3: Para otras URLs limpias /pagina -> pagina.php
+# Si la solicitud no es para un archivo o directorio existente
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+# Y la solicitud no es ya para un archivo .php
+RewriteCond %{REQUEST_URI} !\.php$
+# Y el archivo pagina.php correspondiente existe en el directorio Envios
+RewriteCond %{DOCUMENT_ROOT}/Envios/$1.php -f
+RewriteRule ^([^/.]+)/?$ $1.php [NC,L]
+# El archivo $1.php (ej. produccion.php, con la corrección PHP) redirigirá a index.php#pagina

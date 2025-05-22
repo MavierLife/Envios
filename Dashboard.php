@@ -25,10 +25,11 @@ foreach ($csvFiles as $file) {
 
 // --- INICIO DE LA MODIFICACIÓN PARA OPCIÓN 1 ---
 // Si no es una solicitud AJAX Y se accede directamente a este archivo
-if (empty($_SERVER['HTTP_X_REQUESTED_WITH']) || strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) != 'xmlhttprequest') {
-    $currentPage = basename(__FILE__); // Obtiene "dashboard.php"
-    // Asumiendo que index.php está en el mismo directorio (directorio raíz de /Envios/)
-    header('Location: index.php#' . $currentPage);
+if (empty($_SERVER['HTTP_X_REQUESTED_WITH'])
+    || strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) !== 'xmlhttprequest') {
+    $currentPage = basename(__FILE__);
+    $pageNameWithoutExtension = pathinfo($currentPage, PATHINFO_FILENAME); // obtiene “dashboard”
+    header('Location: index.php#' . $pageNameWithoutExtension);
     exit;
 }
 // --- FIN DE LA MODIFICACIÓN ---

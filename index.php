@@ -220,18 +220,18 @@ if (!isset($_SESSION['user_acceso']) || $_SESSION['user_acceso'] !== 'admin') {
       <nav id="sidebar" class="sidebar collapsed">
         <ul class="nav">
           <li class="nav-item">
-            <a class="nav-link" href="dashboard"><i class="icon-home4"></i><span>Dashboard</span></a>
+            <a class="nav-link" href="#dashboard"><i class="icon-home4"></i><span>Dashboard</span></a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="produccion"><i class="icon-stack"></i><span>Producción</span></a>
+            <a class="nav-link" href="#produccion"><i class="icon-stack"></i><span>Producción</span></a>
           </li>
-          <li class="nav-item"><a class="nav-link" href="validacion.php"><i class="icon-cart5"></i><span>Validación</span></a></li>
-          <li class="nav-item"><a class="nav-link" href="facturacion.php"><i class="icon-file-text2"></i><span>FACTURACION</span></a></li>
-          <li class="nav-item"><a class="nav-link" href="creditos.php"><i class="icon-credit-card"></i><span>CREDITOS</span></a></li>
-          <li class="nav-item"><a class="nav-link" href="inventario.php"><i class="icon-archive"></i><span>INVENTARIO</span></a></li>
-          <li class="nav-item"><a class="nav-link" href="clientes.php"><i class="icon-users"></i><span>CLIENTES</span></a></li>
-          <li class="nav-item"><a class="nav-link" href="configuracion.php"><i class="icon-cogs"></i><span>Configuración</span></a></li>
-          <li class="nav-item"><a class="nav-link" href="ayuda.php"><i class="icon-question3"></i><span>AYUDA</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="#validacion"><i class="icon-cart5"></i><span>Validación</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="#facturacion"><i class="icon-file-text2"></i><span>FACTURACION</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="#creditos"><i class="icon-credit-card"></i><span>CREDITOS</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="#inventario"><i class="icon-archive"></i><span>INVENTARIO</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="#clientes"><i class="icon-users"></i><span>CLIENTES</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="#configuracion"><i class="icon-cogs"></i><span>Configuración</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="#ayuda"><i class="icon-question3"></i><span>AYUDA</span></a></li>
         </ul>
       </nav>
 

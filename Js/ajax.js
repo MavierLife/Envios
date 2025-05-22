@@ -8,16 +8,15 @@ $(document).ready(function() {
     const sidebarOverlay = $('#sidebarOverlay'); // Necesario para cerrar el menú móvil
 
     // Función para cargar contenido
-    function loadPage(pageUrl, pageTitle, pushState = true) {
-        // si viene "/produccion" añade ".php"
+    function loadPage(pageUrl, pageTitle, pushState = true) { // pageUrl es el nombre base, ej: "dashboard"
         let requestUrl = pageUrl.endsWith('.php')
             ? pageUrl
-            : pageUrl + '.php';
+            : pageUrl + '.php'; // requestUrl es "dashboard.php"
 
         $.ajax({
             url: requestUrl,
             type: 'GET',
-            dataType: 'html', // Esperamos HTML por defecto
+            dataType: 'html', 
             beforeSend: function() {
                 contentSection.html('<p style="text-align:center; padding:20px;">Cargando contenido...</p>');
             },
@@ -41,7 +40,8 @@ $(document).ready(function() {
 
                 contentSection.html(response);
                 if (pushState && history.pushState) {
-                    history.pushState({ path: pageUrl }, pageTitle, pageUrl);
+                    // Siempre usar hash para la URL visible y el estado
+                    history.pushState({ path: pageUrl }, pageTitle, '#' + pageUrl); 
                     document.title = pageTitle;
                 }
                 contentSection.scrollTop(0);
@@ -83,76 +83,62 @@ $(document).ready(function() {
     $(document).on('click', '.sidebar .nav-link', function(e) {
         e.preventDefault();
         const $this = $(this);
-        const pageUrl = $this.attr('href');
+        let pageUrlWithHash = $this.attr('href'); // ej: "#dashboard"
         const pageTitle = $this.find('span').text() || $this.text() || "MiMarca";
 
-        if (!pageUrl || pageUrl === '#' || (window.location.pathname + window.location.search + window.location.hash === pageUrl)) {
-            if(pageUrl !== '#') return;
+        if (!pageUrlWithHash || pageUrlWithHash === '#') {
+             // Si es solo # o vacío, no hacer nada, o cerrar menú móvil si está abierto
+            if (window.innerWidth < 768 && body.hasClass('sidebar-mobile-shown')) {
+                body.removeClass('sidebar-mobile-shown');
+                sidebar.removeClass('sidebar-mobile-visible').css('left', `calc(-1 * ${getComputedStyle(document.documentElement).getPropertyValue('--mobile-sidebar-visible-width').trim()} - 10px)`);
+                sidebarOverlay.fadeOut(200);
+            }
+            return;
         }
         
-        if (pageUrl.startsWith('#') && pageUrl.length > 1 && (window.location.pathname + window.location.search) === (window.location.pathname + window.location.search)) {
-            // return; // Opcional: si no quieres que los hashes internos recarguen la página
+        let pageUrl = pageUrlWithHash.substring(1); // pageUrl es "dashboard"
+
+        // Evitar recargar si el hash actual ya es el de la página solicitada
+        if (window.location.hash === pageUrlWithHash) {
+            // Opcional: cerrar el menú móvil si está abierto
+            if (window.innerWidth < 768 && body.hasClass('sidebar-mobile-shown')) {
+                body.removeClass('sidebar-mobile-shown');
+                sidebar.removeClass('sidebar-mobile-visible').css('left', `calc(-1 * ${getComputedStyle(document.documentElement).getPropertyValue('--mobile-sidebar-visible-width').trim()} - 10px)`);
+                sidebarOverlay.fadeOut(200);
+            }
+            return;
         }
 
         $('.sidebar .nav-link.active').removeClass('active');
         $this.addClass('active');
 
-        loadPage(pageUrl, pageTitle);
+        loadPage(pageUrl, pageTitle); // pageUrl es "dashboard"
     });
 
     function loadInitialOrHashedContent() {
-        let pageToLoad = 'dashboard'; // Usar 'dashboard' para que loadPage añada '.php'
+        let pageToLoad = 'dashboard'; 
         let pageTitle = 'Dashboard';
-        let activeLinkSelector = '.sidebar .nav-link[href="dashboard"]'; // MODIFICADO AQUÍ
+        let activeLinkSelector = '.sidebar .nav-link[href="#dashboard"]';
 
-        let potentialPage = '';
         if (window.location.hash && window.location.hash.length > 1) {
-            potentialPage = window.location.hash.substring(1);
-        } else {
-            const currentPath = window.location.pathname.split("/").pop();
-            if (currentPath && currentPath !== 'index.php' && currentPath !== '' && !currentPath.includes("/") && currentPath !== 'Envios') { // Asumiendo que 'Envios' es parte de la ruta base
-                potentialPage = currentPath;
-            }
-        }
-
-        if (potentialPage) {
-            // Intenta encontrar un enlace que coincida con el potentialPage (que ya no debería tener .php si viene de un hash como #dashboard)
-            const $link = $('.sidebar .nav-link[href="' + potentialPage + '"]');
+            const potentialPage = window.location.hash.substring(1); // ej: "dashboard"
+            const $link = $('.sidebar .nav-link[href="#' + potentialPage + '"]');
             if ($link.length) {
-                pageToLoad = potentialPage; // pageToLoad será 'dashboard' o 'produccion', etc.
+                pageToLoad = potentialPage;
                 pageTitle = $link.find('span').text() || $link.text();
-                activeLinkSelector = $link; // $link es el objeto jQuery, no un string selector
+                activeLinkSelector = $link; 
             } else {
-                 console.warn("Página en hash/path '" + potentialPage + "' no encontrada en el sidebar. Cargando dashboard por defecto.");
-                 // Si no se encuentra, pageToLoad y activeLinkSelector se quedan con los valores por defecto para 'dashboard'
+                 console.warn("Página en hash '#" + potentialPage + "' no encontrada en el sidebar. Cargando dashboard por defecto.");
             }
         }
-        
+        // No más lógica de pathname para URLs limpias aquí
+
         const $initialLink = (typeof activeLinkSelector === 'string') ? $(activeLinkSelector) : activeLinkSelector;
 
         if ($initialLink.length) {
             $('.sidebar .nav-link.active').removeClass('active');
             $initialLink.addClass('active');
-            
-            // Determinar si se debe hacer pushState
-            // pageToLoad aquí será el nombre base (ej. 'dashboard')
-            // window.location.hash.substring(1) también será el nombre base (ej. 'dashboard')
-            const currentHashPage = window.location.hash ? window.location.hash.substring(1) : '';
-            const currentPathPage = window.location.pathname.split("/").pop();
-            
-            // Solo hacer pushState si la URL actual (sin #) no es la página a cargar o el hash no coincide
-            let shouldPushState = true;
-            if (currentPathPage === pageToLoad || (currentPathPage === 'index.php' && pageToLoad === 'dashboard')) {
-                 if (!window.location.hash || currentHashPage === pageToLoad) {
-                    shouldPushState = false;
-                 }
-            }
-            if (currentHashPage === pageToLoad) {
-                shouldPushState = false;
-            }
-
-
-            loadPage(pageToLoad, pageTitle, shouldPushState);
+            loadPage(pageToLoad, pageTitle, false); // No hacer pushState en la carga inicial
         } else {
             contentSection.html('<p>Bienvenido. Selecciona una opción del menú o el dashboard no pudo ser cargado.</p>');
             console.warn("No se encontró el link inicial/dashboard para cargar contenido. Selector intentado:", activeLinkSelector);
@@ -161,37 +147,31 @@ $(document).ready(function() {
 
     loadInitialOrHashedContent();
 
-    // Solo un manejador popstate es necesario. Este parece el más completo.
     $(window).on('popstate', function(event) {
-        let pageUrlToLoad;
+        let pageUrlToLoad = 'dashboard'; // Default
         let pageTitle = "MiMarca";
 
         if (event.originalEvent.state && event.originalEvent.state.path) {
             pageUrlToLoad = event.originalEvent.state.path; // ej: "dashboard"
-        } else {
-            if (window.location.hash && window.location.hash.length > 1) {
-                 pageUrlToLoad = window.location.hash.substring(1); // ej: "dashboard"
-            } else {
-                 pageUrlToLoad = window.location.pathname.split("/").pop() || 'dashboard';
-                 if (pageUrlToLoad === 'index.php' || pageUrlToLoad === '' || pageUrlToLoad === 'Envios') pageUrlToLoad = 'dashboard';
-            }
+        } else if (window.location.hash && window.location.hash.length > 1) {
+            pageUrlToLoad = window.location.hash.substring(1); // ej: "dashboard"
         }
+        // No más lógica de pathname para URLs limpias aquí
 
-        const $linkToActivate = $('.sidebar .nav-link[href="' + pageUrlToLoad + '"]');
+        const $linkToActivate = $('.sidebar .nav-link[href="#' + pageUrlToLoad + '"]');
         if ($linkToActivate.length) {
             $('.sidebar .nav-link.active').removeClass('active');
             $linkToActivate.addClass('active');
             pageTitle = $linkToActivate.find('span').text() || $linkToActivate.text();
-            loadPage(pageUrlToLoad, pageTitle, false); 
+            loadPage(pageUrlToLoad, pageTitle, false); // No hacer pushState en popstate
         } else {
-            // Fallback al dashboard si el enlace no se encuentra
-            const $dashboardLink = $('.sidebar .nav-link[href="dashboard"]'); // MODIFICADO AQUÍ
+            const $dashboardLink = $('.sidebar .nav-link[href="#dashboard"]');
             if($dashboardLink.length){
                  $('.sidebar .nav-link.active').removeClass('active');
                 $dashboardLink.addClass('active');
-                loadPage('dashboard', 'Dashboard', false); // Usar 'dashboard' para que loadPage añada '.php'
+                loadPage('dashboard', 'Dashboard', false); 
             } else {
-                console.warn("Popstate: No se encontró el link para:", pageUrlToLoad, "ni el link de dashboard.");
+                console.warn("Popstate: No se encontró el link para '#" + pageUrlToLoad + "', ni el link de dashboard.");
                  contentSection.html('<p>Contenido no encontrado.</p>');
             }
         }

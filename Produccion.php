@@ -4,10 +4,11 @@ require_once 'Config/Database.php'; // Para la conexión a la BD
 
 // --- INICIO DE LA SECCIÓN PARA EVITAR CARGA DIRECTA SIN ESTILOS ---
 // Si no es una solicitud AJAX Y se accede directamente a este archivo
-if (empty($_SERVER['HTTP_X_REQUESTED_WITH']) || strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) != 'xmlhttprequest') {
+if (empty($_SERVER['HTTP_X_REQUESTED_WITH'])
+    || strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) !== 'xmlhttprequest') {
     $currentPage = basename(__FILE__);
-    // Asumiendo que index.php está en el mismo directorio (directorio raíz de /Envios/)
-    header('Location: index.php#' . $currentPage);
+    $pageNameWithoutExtension = pathinfo($currentPage, PATHINFO_FILENAME); // obtiene “produccion”
+    header('Location: index.php#' . $pageNameWithoutExtension);
     exit;
 }
 // --- FIN DE LA SECCIÓN ---
