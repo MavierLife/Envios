@@ -79,8 +79,10 @@ function manejarClicEnTarjetas() {
 // Manejar botones registrar
 function manejarBotonesRegistrar() {
     $('.btn-registrar-produccion').on('click', function(e) {
-        e.stopPropagation(); // Evitar que se dispare el clic de la tarjeta
+        e.stopPropagation(); 
         elementoLanzadorActualParaModal = $(this);
+        // Forzar apertura del modal en escritorio
+        $('#produccionModal').modal('show');
     });
 }
 

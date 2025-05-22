@@ -133,8 +133,10 @@ try {
                                             <span>Producido:</span>
                                             <span class="production-value display-produccion-<?php echo $codigo; ?>">0</span>
                                         </div>
-                                        <button type="button" class="register-btn btn-registrar-produccion"
-                                                data-toggle="modal" data-target="#produccionModal">
+                                        <button type="button" 
+                                                class="register-btn btn-registrar-produccion"
+                                                data-toggle="modal" 
+                                                data-target="#produccionModal">
                                             <i class="icon-plus3"></i>
                                             <span>Registrar</span>
                                         </button>
@@ -211,7 +213,9 @@ try {
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                <button type="button" 
+                        class="btn btn-secondary" 
+                        data-dismiss="modal">             <!-- corregido -->
                     <i class="icon-cross2"></i>
                     Cancelar
                 </button>
