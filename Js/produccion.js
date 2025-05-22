@@ -1,156 +1,381 @@
 $(document).ready(function() {
-    inicializarModal();
-    manejarClicDescripcionEnMovil();
-    manejarGuardadoEnModal();
-    // recalcula el total al cargar
+    inicializarEventos();
+    inicializarEstadosVisuales();
     actualizarTotal();
-
-    // Muestra confirmación si venimos de un guardado exitoso
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('guardado') === 'ok') {
-        Swal.fire({
-            icon: 'success',
-            title: 'Registro exitoso',
-            text: 'El archivo se creó correctamente.'
-        });
-    }
-
-    // valida y pide confirmación antes de enviar
-    $('#formProduccion').on('submit', function(e) {
-        e.preventDefault();
-        var total = parseInt($('#conteoProduccion').text(), 10) || 0;
-        if (total <= 0) {
-            Swal.fire({
-                icon: 'error',
-                title: '¡Error!',
-                text: 'Debes registrar al menos una producción antes de guardar.'
-            });
-            return;
-        }
-        Swal.fire({
-            icon: 'question',
-            title: 'Confirmar registro',
-            text: '¿Desea registrar la producción?',
-            showCancelButton: true,
-            confirmButtonText: 'Sí',
-            cancelButtonText: 'No'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                this.submit();
-            }
-        });
-    });
+    mostrarMensajesEstado();
+    configurarAccesibilidad();
 });
 
+// Variable global para el elemento que lanza el modal
+let elementoLanzadorActualParaModal = null;
 
-// ESTO INICIALIZA EL MODAL: llena los datos cada vez que se abre
+// Inicializar todos los eventos
+function inicializarEventos() {
+    inicializarModal();
+    manejarClicEnTarjetas();
+    manejarBotonesRegistrar();
+    manejarGuardadoEnModal();
+    manejarEnvioFormulario();
+    configurarAtajosTeclado();
+}
+
+// Configurar modal
 function inicializarModal() {
     $('#produccionModal').on('show.bs.modal', function (event) {
-        var disparador;
-        if (event.relatedTarget) {
-            disparador = $(event.relatedTarget);
-        } else if (elementoLanzadorActualParaModal) {
-            disparador = elementoLanzadorActualParaModal;
-        } else {
+        const disparador = event.relatedTarget ? $(event.relatedTarget) : elementoLanzadorActualParaModal;
+        
+        if (!disparador) {
             console.error('No se pudo determinar el origen del modal.');
             return;
         }
 
-        var fila = disparador.closest('tr');
-        if (!fila.length) {
-            console.error('Fila del producto no encontrada para el modal.');
+        const tarjeta = disparador.closest('.product-card');
+        if (!tarjeta.length) {
+            console.error('Tarjeta del producto no encontrada.');
             return;
         }
 
-        var codigo  = fila.data('codigoprod');
-        var desc    = fila.data('descripcion');
-        var unidades= fila.data('unidades');
-        var actual  = $('#input-produccion-' + codigo).val() || 0;
+        const codigo = tarjeta.data('codigoprod');
+        const descripcion = tarjeta.data('descripcion');
+        const unidades = tarjeta.data('unidades');
+        const actual = $('#input-produccion-' + codigo).val() || 0;
 
-        var modal = $(this);
-        modal.find('#modalProductoDescripcion').text(desc);
-        modal.find('#modalProductoCodigo').text(codigo);
-        modal.find('#modalProductoUnidades').text(unidades);
-        modal.find('#modalCodigoProdHidden').val(codigo);
-        modal.find('#modalCantidadProducida').val(actual);
+        // Llenar datos del modal
+        $('#modalProductoDescripcion').text(descripcion);
+        $('#modalProductoCodigo').text(codigo);
+        $('#modalProductoUnidades').text(unidades);
+        $('#modalCodigoProdHidden').val(codigo);
+        $('#modalCantidadProducida').val(actual);
+        
+        // Actualizar título del modal
+        $('#produccionModalLabel').html(`
+            <i class="icon-edit"></i>
+            ${descripcion.length > 30 ? descripcion.substring(0, 30) + '...' : descripcion}
+        `);
     });
 
     $('#produccionModal').on('shown.bs.modal', function () {
         $('#modalCantidadProducida').focus().select();
         elementoLanzadorActualParaModal = null;
     });
+    
+    // Limpiar al cerrar modal
+    $('#produccionModal').on('hidden.bs.modal', function () {
+        elementoLanzadorActualParaModal = null;
+    });
 }
 
-
-// ESTO MANEJA EL CLIC EN LA DESCRIPCIÓN PARA MÓVIL: abre el modal vía JS
-function manejarClicDescripcionEnMovil() {
-    $('table tbody').on('click', '.descripcion-producto', function() {
-        if (window.innerWidth < 768) {
+// Manejar clic en tarjetas (móvil)
+function manejarClicEnTarjetas() {
+    $('.product-card').on('click', function(e) {
+        // Solo en móvil y si no se clickeó un botón
+        if (window.innerWidth < 768 && !$(e.target).closest('button').length) {
             elementoLanzadorActualParaModal = $(this);
             $('#produccionModal').modal('show');
         }
     });
 }
 
+// Manejar botones registrar
+function manejarBotonesRegistrar() {
+    $('.btn-registrar-produccion').on('click', function(e) {
+        e.stopPropagation(); // Evitar que se dispare el clic de la tarjeta
+        elementoLanzadorActualParaModal = $(this);
+    });
+}
 
-// ESTO GUARDA LA CANTIDAD DESDE EL MODAL: actualiza el input y la etiqueta
+// Guardar cantidad desde modal
 function manejarGuardadoEnModal() {
     $('#btnGuardarProduccionModal').on('click', function() {
-        var codigo = $('#modalCodigoProdHidden').val();
-        var cantidad = $('#modalCantidadProducida').val();
+        const codigo = $('#modalCodigoProdHidden').val();
+        const cantidadInput = $('#modalCantidadProducida');
+        const cantidad = cantidadInput.val().trim();
 
+        // Validación
         if (cantidad === '' || isNaN(parseFloat(cantidad)) || parseFloat(cantidad) < 0) {
-            alert('Ingresa una cantidad válida (>= 0).');
-            $('#modalCantidadProducida').focus().select();
+            mostrarError('Ingresa una cantidad válida (mayor o igual a 0).');
+            cantidadInput.focus().select();
             return;
         }
 
-        cantidad = parseFloat(cantidad);
-        $('#input-produccion-' + codigo).val(cantidad);
-        $('.display-produccion-' + codigo).text(cantidad);
-        $('#produccionModal').modal('hide');
+        const cantidadNum = parseFloat(cantidad);
+        
+        // Mostrar loading en el botón
+        const $btn = $(this);
+        const originalText = $btn.html();
+        $btn.html('<div class="spinner" style="width: 16px; height: 16px; border-width: 2px; margin-right: 0.5rem;"></div>Guardando...');
+        $btn.prop('disabled', true);
+        
+        // Simular un pequeño delay para mejor UX
+        setTimeout(() => {
+            // Actualizar valores
+            actualizarProduccion(codigo, cantidadNum);
+            
+            // Restaurar botón
+            $btn.html(originalText);
+            $btn.prop('disabled', false);
+            
+            // Cerrar modal
+            $('#produccionModal').modal('hide');
+            
+            // Mostrar feedback visual
+            mostrarExito('Producción actualizada correctamente');
+        }, 300);
     });
 }
 
+// Actualizar producción específica
+function actualizarProduccion(codigo, cantidad) {
+    const inputProduccion = $('#input-produccion-' + codigo);
+    const displayProduccion = $('.display-produccion-' + codigo);
+    const tarjeta = $(`.product-card[data-codigoprod="${codigo}"]`);
+    const badge = $('#badge-' + codigo);
+    
+    // Actualizar valores
+    inputProduccion.val(cantidad);
+    displayProduccion.text(cantidad);
+    
+    // Actualizar badge y estados visuales
+    if (cantidad > 0) {
+        badge.removeClass('zero');
+        tarjeta.addClass('has-production');
+    } else {
+        badge.addClass('zero');
+        tarjeta.removeClass('has-production');
+    }
+    
+    // Agregar clase de animación para feedback visual
+    tarjeta.addClass('success-flash');
+    setTimeout(() => {
+        tarjeta.removeClass('success-flash');
+    }, 500);
+    
+    // Actualizar total
+    actualizarTotal();
+}
 
-// recalcula el total de producción registrada
+// Manejar envío del formulario
+function manejarEnvioFormulario() {
+    $('#formProduccion').on('submit', function(e) {
+        e.preventDefault();
+        
+        const total = parseInt($('#conteoProduccion').text(), 10) || 0;
+        
+        if (total <= 0) {
+            mostrarError('Debes registrar al menos una producción antes de guardar.');
+            return;
+        }
+        
+        // Mostrar diálogo de confirmación
+        Swal.fire({
+            icon: 'question',
+            title: 'Confirmar registro',
+            text: `¿Desea registrar la producción total de ${total} unidades?`,
+            showCancelButton: true,
+            confirmButtonText: 'Sí, registrar',
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: '#28a745',
+            cancelButtonColor: '#6c757d'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Mostrar loading
+                Swal.fire({
+                    title: 'Registrando...',
+                    text: 'Por favor espere',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+                
+                // Enviar formulario
+                this.submit();
+            }
+        });
+    });
+}
+
+// Configurar atajos de teclado
+function configurarAtajosTeclado() {
+    $(document).on('keydown', function(e) {
+        // Escape para cerrar modal
+        if (e.key === 'Escape' && $('#produccionModal').hasClass('show')) {
+            $('#produccionModal').modal('hide');
+        }
+        
+        // Enter en el modal para guardar
+        if (e.key === 'Enter' && $('#produccionModal').hasClass('show')) {
+            e.preventDefault();
+            $('#btnGuardarProduccionModal').click();
+        }
+        
+        // Ctrl+S para guardar formulario
+        if (e.ctrlKey && e.key === 's') {
+            e.preventDefault();
+            $('#formProduccion').submit();
+        }
+    });
+}
+
+// Configurar accesibilidad
+function configurarAccesibilidad() {
+    // ARIA labels dinámicos
+    $('.btn-registrar-produccion').attr('aria-label', function() {
+        const tarjeta = $(this).closest('.product-card');
+        const descripcion = tarjeta.data('descripcion');
+        return `Registrar producción para ${descripcion}`;
+    });
+    
+    // Anunciar cambios al lector de pantalla
+    $('#conteoProduccion').attr('aria-live', 'polite');
+    
+    // Mejorar accesibilidad del modal
+    $('#produccionModal').attr('aria-describedby', 'modalProductoDescripcion');
+}
+
+// Recalcular total de producción
 function actualizarTotal() {
-    const inputs = document.querySelectorAll('.produccion-hidden-input');
+    const inputs = $('.produccion-hidden-input');
     let total = 0;
-    inputs.forEach(i => {
-        total += parseInt(i.value, 10) || 0;
+    
+    inputs.each(function() {
+        const valor = parseInt($(this).val(), 10) || 0;
+        total += valor;
     });
-    document.getElementById('conteoProduccion').textContent = total;
+    
+    const $contador = $('#conteoProduccion');
+    const valorAnterior = parseInt($contador.text(), 10) || 0;
+    
+    // Actualizar valor
+    $contador.text(total);
+    
+    // Animación si cambió el valor
+    if (total !== valorAnterior) {
+        $contador.addClass('success-flash');
+        setTimeout(() => {
+            $contador.removeClass('success-flash');
+        }, 500);
+    }
+    
+    // Actualizar estado del botón de envío
+    const $btnEnviar = $('#btnGuardarTodo');
+    if (total > 0) {
+        $btnEnviar.prop('disabled', false).removeClass('btn-secondary').addClass('save-btn');
+    } else {
+        $btnEnviar.prop('disabled', true).removeClass('save-btn').addClass('btn-secondary');
+    }
 }
 
-// al iniciar, muestra el total (0 o lo que haya)
-document.addEventListener('DOMContentLoaded', function() {
-  var form = document.getElementById('formProduccion');
-  form.addEventListener('submit', function(e) {
-    var total = parseInt(document.getElementById('conteoProduccion').innerText, 10) || 0;
-    if (total <= 0) {
-      e.preventDefault();
-      Swal.fire({
+// Mostrar mensajes de estado
+function mostrarMensajesEstado() {
+    const params = new URLSearchParams(window.location.search);
+    
+    if (params.get('guardado') === 'ok') {
+        mostrarExito('El registro se creó correctamente.');
+        // Limpiar URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+    
+    if (params.get('error') === '1') {
+        mostrarError('Ocurrió un error al procesar la solicitud.');
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+}
+
+// Funciones de utilidad para mensajes
+function mostrarExito(mensaje) {
+    Swal.fire({
+        icon: 'success',
+        title: '¡Éxito!',
+        text: mensaje,
+        timer: 3000,
+        showConfirmButton: false,
+        toast: true,
+        position: 'top-end'
+    });
+}
+
+function mostrarError(mensaje) {
+    Swal.fire({
         icon: 'error',
         title: '¡Error!',
-        text: 'Debes registrar al menos una producción antes de guardar.'
-      });
+        text: mensaje,
+        confirmButtonText: 'Entendido',
+        confirmButtonColor: '#dc3545'
+    });
+}
+
+function mostrarAdvertencia(mensaje) {
+    Swal.fire({
+        icon: 'warning',
+        title: 'Atención',
+        text: mensaje,
+        confirmButtonText: 'Entendido',
+        confirmButtonColor: '#ffc107'
+    });
+}
+
+// Función para manejar errores de red o conexión
+function manejarErrorConexion() {
+    mostrarError('Error de conexión. Por favor, verifica tu conexión a internet e intenta nuevamente.');
+}
+
+// Debounce para optimizar actualizaciones
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// Versión optimizada de actualizar total con debounce
+const actualizarTotalOptimizado = debounce(actualizarTotal, 300);
+
+// Event listeners adicionales para mejor UX
+$(window).on('resize', debounce(function() {
+    // Reconfigurar eventos móviles si cambia el tamaño de pantalla
+    if (window.innerWidth >= 768) {
+        $('.product-card').off('click.mobile');
     }
-  });
+}, 250));
+
+// Validación en tiempo real en el modal
+$('#modalCantidadProducida').on('input', function() {
+    const valor = $(this).val();
+    const $btn = $('#btnGuardarProduccionModal');
+    
+    if (valor === '' || isNaN(parseFloat(valor)) || parseFloat(valor) < 0) {
+        $btn.prop('disabled', true);
+        $(this).addClass('is-invalid');
+    } else {
+        $btn.prop('disabled', false);
+        $(this).removeClass('is-invalid');
+    }
 });
 
-// en tu handler de guardar en modal (ejemplo):
-document.getElementById('btnGuardarProduccionModal').addEventListener('click', function() {
-    const codigo = document.getElementById('modalCodigoProdHidden').value;
-    const cantidad = parseInt(document.getElementById('modalCantidadProducida').value, 10) || 0;
-
-    // actualiza el span y el input hidden
-    document.querySelector('.display-produccion-' + codigo).textContent = cantidad;
-    document.getElementById('input-produccion-' + codigo).value = cantidad;
-
-    // recalcula total
+// Limpiar formulario (si es necesario)
+function limpiarFormulario() {
+    $('.produccion-hidden-input').val(0);
+    $('.display-produccion').text(0);
+    $('.production-badge').addClass('zero');
+    $('.product-card').removeClass('has-production');
     actualizarTotal();
+    mostrarExito('Formulario limpiado correctamente');
+}
 
-    // cierra modal
-    $('#produccionModal').modal('hide');
-});
+// Función adicional para inicializar estados visuales al cargar
+function inicializarEstadosVisuales() {
+    $('.produccion-hidden-input').each(function() {
+        const codigo = $(this).attr('id').replace('input-produccion-', '');
+        const cantidad = parseInt($(this).val()) || 0;
+        
+        if (cantidad > 0) {
+            actualizarProduccion(codigo, cantidad);
+        }
+    });
+}
