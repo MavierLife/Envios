@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once 'Config/Database.php'; // Agregar conexión a base de datos
 
 // --- MOVER CONTEO ANTES DEL GUARDIA AJAX ---
 $csvFiles = glob(__DIR__ . '/ProdPendientes/*.csv');
@@ -21,6 +22,25 @@ foreach ($csvFiles as $file) {
         fclose($handle);
     }
 }
+
+// Leer datos del inventario
+$inventarioPath = __DIR__ . '/Inventario/inventario.csv';
+$inventario = [];
+if (file_exists($inventarioPath) && ($handle = fopen($inventarioPath, 'r')) !== false) {
+    $headers = fgetcsv($handle); // Leer cabecera
+    while (($row = fgetcsv($handle)) !== false) {
+        if (isset($row[0], $row[1], $row[2], $row[3], $row[4])) {
+            $inventario[] = [
+                'codigo' => $row[0],
+                'descripcion' => $row[1],
+                'inventario' => (int)$row[2],
+                'usuario' => $row[3],
+                'fecha' => $row[4]
+            ];
+        }
+    }
+    fclose($handle);
+}
 // ---------------------------------------------
 
 // --- INICIO DE LA MODIFICACIÓN PARA OPCIÓN 1 ---
@@ -28,7 +48,7 @@ foreach ($csvFiles as $file) {
 if (empty($_SERVER['HTTP_X_REQUESTED_WITH'])
     || strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) !== 'xmlhttprequest') {
     $currentPage = basename(__FILE__);
-    $pageNameWithoutExtension = pathinfo($currentPage, PATHINFO_FILENAME); // obtiene “dashboard”
+    $pageNameWithoutExtension = pathinfo($currentPage, PATHINFO_FILENAME); // obtiene "dashboard"
     header('Location: index.php#' . $pageNameWithoutExtension);
     exit;
 }
@@ -39,16 +59,6 @@ if (!isset($_SESSION['user_id'])) {
     echo json_encode(['error' => 'Session expired', 'redirect' => 'login.php?session_expired=true']);
     exit;
 }
-
-// Opcional: Verificación de rol específico para esta página
-/*
-if (!isset($_SESSION['user_acceso']) || $_SESSION['user_acceso'] !== 'rol_para_dashboard') {
-    http_response_code(403); // Prohibido
-    echo json_encode(['error' => 'Access denied', 'message' => 'No tienes permiso para ver el Dashboard.']);
-    exit;
-}
-*/
-
 ?>
 
 <div class="container-fluid">
@@ -64,8 +74,7 @@ if (!isset($_SESSION['user_acceso']) || $_SESSION['user_acceso'] !== 'rol_para_d
                 <div class="panel-heading">
                     <div class="row">
                         <div class="col-xs-3">
-                            <!-- Antes: <i class="icon-cart5 fa-5x"></i> -->
-                            <i class="icon-stack-check fa-5x"></i>  <!-- Validaciones pendientes -->
+                            <i class="icon-stack-check fa-5x"></i>
                         </div>
                         <div class="col-xs-9 text-right">
                             <div class="huge"><?php echo $validacionesPendiente; ?></div>
@@ -73,7 +82,7 @@ if (!isset($_SESSION['user_acceso']) || $_SESSION['user_acceso'] !== 'rol_para_d
                         </div>
                     </div>
                 </div>
-                <a href="#">
+                <a href="#validacion">
                     <div class="panel-footer">
                         <span class="pull-left">Ver Detalles</span>
                         <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
@@ -87,8 +96,7 @@ if (!isset($_SESSION['user_acceso']) || $_SESSION['user_acceso'] !== 'rol_para_d
                 <div class="panel-heading">
                     <div class="row">
                         <div class="col-xs-3">
-                            <!-- Antes: <i class="icon-stats-dots fa-5x"></i> -->
-                            <i class="icon-stats-bars fa-5x"></i>   <!-- Unidades totales pendientes -->
+                            <i class="icon-stats-bars fa-5x"></i>
                         </div>
                         <div class="col-xs-9 text-right">
                             <div class="huge"><?php echo $unidadesPendientes; ?></div>
@@ -96,7 +104,7 @@ if (!isset($_SESSION['user_acceso']) || $_SESSION['user_acceso'] !== 'rol_para_d
                         </div>
                     </div>
                 </div>
-                <a href="#">
+                <a href="#validacion">
                     <div class="panel-footer">
                         <span class="pull-left">Ver Detalles</span>
                         <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
@@ -107,12 +115,94 @@ if (!isset($_SESSION['user_acceso']) || $_SESSION['user_acceso'] !== 'rol_para_d
         </div>
     </div>
 
+    <!-- Panel de inventario actual -->
     <div class="row">
         <div class="col-lg-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">
-                        <!-- Mantener icon-clock para actividad reciente -->
+                        <i class="icon-archive"></i> Inventario Actual
+                        <?php if (!empty($inventario)): ?>
+                            <span style="background: rgba(255,255,255,0.2); padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.8rem; margin-left: 0.5rem;">
+                                <?php echo count($inventario); ?> productos
+                            </span>
+                        <?php endif; ?>
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <?php if (empty($inventario)): ?>
+                        <div class="alert alert-info">
+                            <i class="icon-info" style="margin-right: 0.5rem;"></i>
+                            <strong>Sin productos en inventario</strong><br>
+                            No hay productos registrados en el inventario.
+                        </div>
+                    <?php else: ?>
+                        <div class="products-grid">
+                            <?php foreach ($inventario as $producto): 
+                                $codigo = htmlspecialchars($producto['codigo']);
+                                $descripcion = htmlspecialchars($producto['descripcion']);
+                                $cantidad = (int)$producto['inventario'];
+                                $usuario = htmlspecialchars($producto['usuario']);
+                                $fecha = htmlspecialchars($producto['fecha']);
+                                
+                                // Determinar clase de tarjeta basada en inventario
+                                $cardClass = $cantidad > 0 ? 'has-production' : '';
+                                $badgeClass = $cantidad > 0 ? '' : 'zero';
+                            ?>
+                            <div class="product-card <?php echo $cardClass; ?>" 
+                                 id="inv-card-<?php echo $codigo; ?>"
+                                 data-codigoprod="<?php echo $codigo; ?>"
+                                 data-descripcion="<?php echo $descripcion; ?>">
+                                
+                                <div class="production-badge <?php echo $badgeClass; ?>" id="inv-badge-<?php echo $codigo; ?>">
+                                    <span><?php echo $cantidad; ?></span>
+                                </div>
+                                
+                                <div class="product-header">
+                                    <div class="product-icon">
+                                        <i class="icon-archive"></i>
+                                    </div>
+                                    <div class="product-info">
+                                        <div class="product-name"><?php echo $descripcion; ?></div>
+                                        <div class="product-meta">
+                                            <span>
+                                                <i class="icon-barcode"></i>
+                                                Código: <?php echo $codigo; ?>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="production-controls">
+                                    <div class="production-display">
+                                        <span>En inventario:</span>
+                                        <span class="production-value"><?php echo $cantidad; ?></span>
+                                    </div>
+                                    <div class="product-meta">
+                                        <span>
+                                            <i class="icon-user"></i>
+                                            Actualizado por: <?php echo $usuario; ?>
+                                        </span>
+                                        <span>
+                                            <i class="icon-calendar"></i>
+                                            Fecha: <?php echo date('d/m/Y', strtotime($fecha)); ?>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
                         <i class="icon-clock fa-lg"></i> Actividad Reciente
                     </h3>
                 </div>
@@ -125,3 +215,31 @@ if (!isset($_SESSION['user_acceso']) || $_SESSION['user_acceso'] !== 'rol_para_d
         </div>
     </div>
 </div>
+
+<!-- Añadir estilos de produccion.css para las tarjetas -->
+<link rel="stylesheet" href="Css/produccion.css">
+<style>
+    /* Estilos adicionales para las tarjetas de inventario */
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+    
+    /* Modificar colores para diferenciar de producción */
+    #inv-card .production-badge {
+        background: #17a2b8; /* Color azul para inventario */
+    }
+    
+    .product-card.has-production .product-icon {
+        background: #28a745; /* Verde para productos con inventario */
+    }
+    
+    /* Ajustes para móvil */
+    @media (max-width: 767px) {
+        .products-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
