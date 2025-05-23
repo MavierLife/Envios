@@ -65,17 +65,24 @@ if ($action === 'aceptar') {
         }
     }
 
-    // 4) Volver a escribir el CSV de inventario
-    if (($h = fopen($invPath, 'w')) !== false) {
-        fputcsv($h, ['CodigoPROD','Descripcion','Inventario','UsuarioUpdate','Fecha']);
-        foreach ($inventory as $code => $info) {
-            fputcsv($h, [
-                $code,
-                $info['Descripcion'],
-                $info['Inventario'],
-                $info['UsuarioUpdate'],
-                $info['Fecha'],
-            ]);
+    // 4) Volver a escribir el CSV de inventario con bloqueo
+    $h = fopen($invPath, 'c+');
+    if ($h !== false) {
+        if (flock($h, LOCK_EX)) {                // bloqueo exclusivo
+            ftruncate($h, 0);                   // vaciar contenido
+            rewind($h);                         // volver al inicio
+            fputcsv($h, ['CodigoPROD','Descripcion','Inventario','UsuarioUpdate','Fecha']);
+            foreach ($inventory as $code => $info) {
+                fputcsv($h, [
+                    $code,
+                    $info['Descripcion'],
+                    $info['Inventario'],
+                    $info['UsuarioUpdate'],
+                    $info['Fecha'],
+                ]);
+            }
+            fflush($h);                         // asegurar escritura
+            flock($h, LOCK_UN);                // liberar bloqueo
         }
         fclose($h);
     }
