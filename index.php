@@ -225,7 +225,11 @@ if (!isset($_SESSION['user_acceso']) || $_SESSION['user_acceso'] !== 'admin') {
           <li class="nav-item">
             <a class="nav-link" href="#produccion"><i class="icon-stack"></i><span>Producción</span></a>
           </li>
-          <li class="nav-item"><a class="nav-link" href="#validacion"><i class="icon-cart5"></i><span>Validación</span></a></li>
+          <li class="nav-item">
+            <a class="nav-link" href="#validacion">
+              <i class="icon-check"></i><span>Validación</span>
+            </a>
+          </li>
           <li class="nav-item"><a class="nav-link" href="#facturacion"><i class="icon-file-text2"></i><span>FACTURACION</span></a></li>
           <li class="nav-item"><a class="nav-link" href="#creditos"><i class="icon-credit-card"></i><span>CREDITOS</span></a></li>
           <li class="nav-item"><a class="nav-link" href="#inventario"><i class="icon-archive"></i><span>INVENTARIO</span></a></li>

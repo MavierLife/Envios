@@ -18,8 +18,12 @@ if (!is_array($produccion) || empty($produccion)) {
 }
 
 // Código EMP del usuario logueado
-$userCode = $_SESSION['user_code'] ?? $_SESSION['user_id'];
-$fecha    = date('Y-m-d H:i:s');
+$userCode     = $_SESSION['user_code'] ?? $_SESSION['user_id'];
+// Nombre completo del usuario (sin truncar)
+$userFullName = $_SESSION['user_name'] ?? '';
+$userName     = $userFullName;
+
+$fecha = date('Y-m-d H:i:s');
 
 // Conexión a la BD
 $db = (new Database())->getConnection();
@@ -35,13 +39,19 @@ $stmt          = $db->prepare($sql);
 $stmt->execute($codigos);
 $descs         = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
 
-// Armar las líneas del archivo
+// Armar las líneas tab-delimitadas
 $lineas = [];
 foreach ($produccion as $codigo => $cantidad) {
     $cantidad = floatval($cantidad);
     if ($cantidad <= 0) continue;    // ← ignorar si la cantidad es 0 o negativa
     $descripcion = $descs[$codigo] ?? '';
-    $lineas[]    = implode("\t", [$codigo, $descripcion, $cantidad, $userCode, $fecha]);
+    $lineas[]    = implode("\t", [
+        $codigo,
+        $descripcion,
+        $cantidad,
+        $userName,  // ← aquí usar $userName
+        $fecha
+    ]);
 }
 
 // Directorio y nombre de archivo .csv
@@ -61,7 +71,13 @@ foreach ($produccion as $codigo => $cantidad) {
     $cantidad = floatval($cantidad);
     if ($cantidad <= 0) continue;
     $descripcion = $descs[$codigo] ?? '';
-    fputcsv($fp, [$codigo, $descripcion, $cantidad, $userCode, $fecha]);
+    fputcsv($fp, [
+        $codigo,
+        $descripcion,
+        $cantidad,
+        $userName,  // ← aquí usar $userName
+        $fecha
+    ]);
 }
 fclose($fp);
 

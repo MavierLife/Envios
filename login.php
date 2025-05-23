@@ -47,10 +47,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 session_regenerate_id(true);
 
                 $_SESSION['user_id']   = $row['UUIDEmpleado'];
-                $_SESSION['user_name'] = $row['Nombres'] . ' ' . $row['Apellidos'];
+                $_SESSION['user_name'] = $row['Nombres'];   // ← solo nombres, sin apellidos
                 $_SESSION['user_code'] = $row['CodigoEMP'];
-                $_SESSION['user_acceso']= $row['ModuloAcceso'];
-
                 header('Location: index.php#dashboard'); // MODIFICADO AQUÍ
                 exit;
             } else {
