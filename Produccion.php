@@ -142,10 +142,6 @@ try {
                                         </button>
                                     </div>
                                     
-                                    <div class="touch-indicator">
-                                        <i class="icon-hand"></i> Toca para registrar
-                                    </div>
-                                    
                                     <input type="hidden" 
                                            class="produccion-hidden-input"
                                            name="produccion[<?php echo $codigo; ?>]"

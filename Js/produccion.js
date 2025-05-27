@@ -190,8 +190,59 @@ function manejarEnvioFormulario() {
                     }
                 });
                 
-                // Enviar formulario
-                this.submit();
+                // Crear un FormData con los datos del formulario
+                const formData = new FormData(this);
+                
+                // Enviar mediante AJAX en lugar de submit normal
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        // Verificamos si es JSON
+                        try {
+                            const data = JSON.parse(response);
+                            
+                            if (data.status === 'ok') {
+                                // Mostrar mensaje de éxito
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: '¡Éxito!',
+                                    text: 'La producción se registró correctamente',
+                                    confirmButtonColor: '#28a745'
+                                }).then(() => {
+                                    // Abrir ticket en nueva ventana
+                                    if (data.file) {
+                                        window.open('generar_ticket.php?file=' + data.file + '&autoprint=true', '_blank');
+                                    }
+                                    
+                                    // Limpiar formulario
+                                    limpiarFormulario();
+                                });
+                            } else {
+                                mostrarError('Error al guardar: ' + (data.message || 'Error desconocido'));
+                            }
+                        } catch(e) {
+                            // Si no es JSON, asumimos que es una redirección (el código antiguo)
+                            // Abrir ticket en nueva ventana, intentando extraer el nombre del archivo
+                            const fileMatch = response.match(/produccion_[0-9_]+\.csv/);
+                            if (fileMatch && fileMatch[0]) {
+                                window.open('generar_ticket.php?file=' + fileMatch[0] + '&autoprint=true', '_blank');
+                            }
+                            
+                            // Limpiar formulario
+                            limpiarFormulario();
+                            
+                            // Actualizar UI si es necesario
+                            mostrarExito('El registro se creó correctamente.');
+                        }
+                    },
+                    error: function() {
+                        mostrarError('Ocurrió un error al procesar la solicitud.');
+                    }
+                });
             }
         });
     });

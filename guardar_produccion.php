@@ -13,7 +13,7 @@ if (!isset($_SESSION['user_id'])) {
 
 $produccion = $_POST['produccion'] ?? [];
 if (!is_array($produccion) || empty($produccion)) {
-    header('Location: Produccion.php');
+    echo json_encode(['status' => 'error', 'message' => 'No hay producción para guardar']);
     exit;
 }
 
@@ -28,7 +28,8 @@ $fecha = date('Y-m-d H:i:s');
 // Conexión a la BD
 $db = (new Database())->getConnection();
 if (!$db) {
-    die('Error de conexión a la base de datos');
+    echo json_encode(['status' => 'error', 'message' => 'Error de conexión a la base de datos']);
+    exit;
 }
 
 // Obtener descripciones de los productos
@@ -81,6 +82,10 @@ foreach ($produccion as $codigo => $cantidad) {
 }
 fclose($fp);
 
-// Redirigir de vuelta a Producción dentro del SPA
-header('Location: Produccion.php?guardado=ok');
+// Devolver respuesta JSON en lugar de redireccionar
+echo json_encode([
+    'status' => 'ok',
+    'message' => 'Producción guardada correctamente',
+    'file' => $nombre
+]);
 exit;
