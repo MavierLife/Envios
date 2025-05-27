@@ -130,8 +130,8 @@ $(function(){
     
     $('#csvDetalleModal').modal('show');
     
-    // Cargar el contenido
-    $.get('detalle_validacion.php', { file: file })
+    // Cargar el contenido - LÍNEA CORREGIDA
+    $.get('controllers/detalle_validacion.php', { file: file })
       .done(function(html){
         $('#csvDetalleContent').html(html);
       })
@@ -159,7 +159,7 @@ $(function(){
         // Simular llamada AJAX para aceptar
         setTimeout(() => {
           // Aquí iría la llamada real a tu endpoint
-          $.post('procesar_validacion.php', { 
+          $.post('controllers/procesar_validacion.php', { 
             action: 'aceptar', 
             file: file 
           })
@@ -210,7 +210,7 @@ $(function(){
         // Simular llamada AJAX para rechazar
         setTimeout(() => {
           // Aquí iría la llamada real a tu endpoint
-          $.post('procesar_validacion.php', { 
+          $.post('controllers/procesar_validacion.php', { 
             action: 'rechazar', 
             file: file 
           })

@@ -195,7 +195,8 @@ function manejarEnvioFormulario() {
                 
                 // Enviar mediante AJAX en lugar de submit normal
                 $.ajax({
-                    url: $(this).attr('action'),
+                    // url: 'controllers/' + $(this).attr('action'), // QUITAR O COMENTAR ESTA LÍNEA
+                    url: $(this).attr('action'), // USAR ESTA LÍNEA EN SU LUGAR
                     type: 'POST',
                     data: formData,
                     processData: false,

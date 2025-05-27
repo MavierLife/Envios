@@ -3,23 +3,23 @@
         {
             "codigo": "0003808",
             "descripcion": "QUALITY FRANCES",
-            "inventario": 10,
+            "inventario": 30,
             "usuarioUpdate": "JOSE ANTONIO",
-            "fecha": "2025-05-27 01:59:30"
+            "fecha": "2025-05-27 19:25:08"
         },
         {
             "codigo": "0006896",
             "descripcion": "QUALITY CONCHA GRD",
-            "inventario": 0,
+            "inventario": 50,
             "usuarioUpdate": "JOSE ANTONIO",
-            "fecha": "2025-05-23 01:10:24"
+            "fecha": "2025-05-27 17:20:27"
         },
         {
             "codigo": "0007039",
             "descripcion": "QUALITY ALEMANA",
-            "inventario": 0,
+            "inventario": 20,
             "usuarioUpdate": "JOSE ANTONIO",
-            "fecha": "2025-05-23 01:10:24"
+            "fecha": "2025-05-27 19:25:08"
         },
         {
             "codigo": "0007175",
@@ -52,9 +52,9 @@
         {
             "codigo": "0007183",
             "descripcion": "QUALITY NEGRITAS",
-            "inventario": 0,
+            "inventario": 10,
             "usuarioUpdate": "JOSE ANTONIO",
-            "fecha": "2025-05-23 01:10:24"
+            "fecha": "2025-05-27 18:59:17"
         },
         {
             "codigo": "0007184",
@@ -66,9 +66,9 @@
         {
             "codigo": "0007210",
             "descripcion": "QUALITY TORTA CHOCOLATE",
-            "inventario": 0,
+            "inventario": 20,
             "usuarioUpdate": "JOSE ANTONIO",
-            "fecha": "2025-05-23 01:37:21"
+            "fecha": "2025-05-27 19:25:08"
         },
         {
             "codigo": "0007241",
@@ -99,5 +99,5 @@
             "fecha": "2025-05-23 01:10:24"
         }
     ],
-    "ultimaActualizacion": "2025-05-27 01:59:30"
+    "ultimaActualizacion": "2025-05-27 19:25:08"
 }

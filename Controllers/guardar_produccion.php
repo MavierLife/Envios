@@ -1,12 +1,12 @@
 <?php
 session_start();
-require_once 'Config/Database.php';           // ← corrije la barra y nombre de archivo
+require_once '../Config/Database.php';
 
 if (!isset($_SESSION['user_id'])) {
     http_response_code(401);
     echo json_encode([
         'error'    => 'Session expired',
-        'redirect' => 'login.php?session_expired=true'
+        'redirect' => '../login.php?session_expired=true'
     ]);
     exit;
 }
@@ -56,7 +56,7 @@ foreach ($produccion as $codigo => $cantidad) {
 }
 
 // Directorio y nombre de archivo .csv
-$dir      = __DIR__ . DIRECTORY_SEPARATOR . 'ProdPendientes';
+$dir      = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'ProdPendientes';
 if (!is_dir($dir)) {
     mkdir($dir, 0755, true);
 }
@@ -76,7 +76,7 @@ foreach ($produccion as $codigo => $cantidad) {
         $codigo,
         $descripcion,
         $cantidad,
-        $userName,  // ← aquí usar $userName
+        $userName,
         $fecha
     ]);
 }

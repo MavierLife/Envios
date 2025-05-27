@@ -92,7 +92,7 @@ try {
                             No se encontraron productos que contengan la palabra "Quality" o no hay productos registrados.
                         </div>
                     <?php elseif (!empty($productos)): ?>
-                        <form id="formProduccion" action="guardar_produccion.php" method="post">
+                        <form id="formProduccion" action="controllers/guardar_produccion.php" method="post">
                             <div class="products-grid">
                                 <?php foreach ($productos as $producto): 
                                     $codigo = htmlspecialchars($producto['CodigoPROD']);

@@ -1,7 +1,7 @@
 <?php
 if (empty($_GET['file'])) exit('Archivo no especificado');
 $file = basename($_GET['file']);
-$path = __DIR__ . '/ProdPendientes/' . $file;
+$path = dirname(__DIR__) . '/ProdPendientes/' . $file;
 if (!is_readable($path)) exit('No se puede leer el archivo.');
 
 echo '<table class="table table-sm table-bordered">';
