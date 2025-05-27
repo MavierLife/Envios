@@ -62,78 +62,89 @@ $fechaFormateada = date('d/m/Y H:i', strtotime($fecha));
         @media print {
             @page {
                 margin: 0;
-                size: 72mm auto;  /* Ancho de 72mm, altura automática */
+                size: 80mm auto;  /* Ancho de 8cm y altura automática */
             }
             body {
                 margin: 0;
-                padding: 5mm;
-                width: 72mm;
+                padding: 3mm;    /* Padding reducido */
+                width: 80mm;     /* Ancho de 8cm */
                 font-family: 'Courier New', monospace;
-                font-size: 10pt;
+                font-size: 8pt;  /* Tamaño de fuente reducido */
+                min-height: auto;
+                height: auto;
+            }
+            .ticket-footer {
+                position: relative;
+                bottom: auto;
+                margin-bottom: 0;
+            }
+            .print-button {
+                display: none !important;  /* Ocultar el botón al imprimir */
             }
         }
         
         body {
             font-family: 'Courier New', monospace;
-            width: 72mm;
+            width: 80mm;
             margin: 0 auto;
-            padding: 5mm;
-            font-size: 10pt;
+            padding: 3mm;       /* Padding reducido */
+            font-size: 8pt;     /* Tamaño de fuente reducido */
+            height: auto;
         }
         
         .ticket-header {
             text-align: center;
             border-bottom: 1px dashed #000;
-            padding-bottom: 5mm;
-            margin-bottom: 5mm;
+            padding-bottom: 3mm;  /* Padding reducido */
+            margin-bottom: 3mm;   /* Margen reducido */
         }
         
         .ticket-title {
-            font-size: 12pt;
+            font-size: 10pt;      /* Tamaño de fuente reducido */
             font-weight: bold;
-            margin: 2mm 0;
+            margin: 1mm 0;        /* Margen reducido */
         }
         
         .ticket-info {
-            margin: 3mm 0;
+            margin: 2mm 0;        /* Margen reducido */
+            font-size: 8pt;       /* Tamaño de fuente reducido */
         }
         
         .ticket-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 5mm 0;
+            margin: 3mm 0;        /* Margen reducido */
+            font-size: 8pt;       /* Tamaño de fuente reducido */
         }
         
         .ticket-table th {
             border-bottom: 1px solid #000;
             text-align: left;
-            padding: 1mm 0;
+            padding: 0.5mm 0;     /* Padding reducido */
         }
         
         .ticket-table td {
-            padding: 1mm 0;
-        }
-        
-        .ticket-footer {
-            text-align: center;
-            border-top: 1px dashed #000;
-            padding-top: 5mm;
-            margin-top: 5mm;
-            font-size: 9pt;
+            padding: 0.5mm 0;     /* Padding reducido */
         }
         
         .text-right {
             text-align: right;
+            padding-right: 5mm;   /* Añadir padding a la derecha */
         }
         
         .text-center {
             text-align: center;
         }
         
+        .cantidad-col {
+            min-width: 15mm;      /* Ancho mínimo para la columna de cantidad */
+            text-align: center;   /* Centrar el texto */
+        }
+        
         .total-row {
             font-weight: bold;
             border-top: 1px solid #000;
-            padding-top: 2mm;
+            padding-top: 1mm;     /* Padding reducido */
         }
         
         @media screen {
@@ -145,22 +156,23 @@ $fechaFormateada = date('d/m/Y H:i', strtotime($fecha));
             
             .print-button {
                 display: block;
-                width: 72mm;
-                margin: 5mm auto;
-                padding: 2mm;
+                width: 80mm;
+                margin: 3mm auto;   /* Margen reducido */
+                padding: 1.5mm;     /* Padding reducido */
                 background: #007bff;
                 color: white;
                 text-align: center;
                 cursor: pointer;
                 border: none;
-                border-radius: 2mm;
+                border-radius: 1.5mm; /* Radio reducido */
+                font-size: 9pt;       /* Tamaño de fuente reducido */
             }
         }
     </style>
 </head>
 <body>
     <div class="ticket-header">
-        <div class="ticket-title">GRUPO BENAVIDES</div>
+        <div class="ticket-title">QUALIY BREAD</div>
         <div>HelenStock - Registro de Producción</div>
     </div>
     
@@ -175,7 +187,7 @@ $fechaFormateada = date('d/m/Y H:i', strtotime($fecha));
             <tr>
                 <th>Código</th>
                 <th>Producto</th>
-                <th class="text-right">Cant.</th>
+                <th class="cantidad-col">Cant.</th>
             </tr>
         </thead>
         <tbody>
@@ -183,12 +195,12 @@ $fechaFormateada = date('d/m/Y H:i', strtotime($fecha));
             <tr>
                 <td><?php echo htmlspecialchars($producto['codigo']); ?></td>
                 <td><?php echo htmlspecialchars($producto['descripcion']); ?></td>
-                <td class="text-right"><?php echo htmlspecialchars($producto['cantidad']); ?></td>
+                <td class="cantidad-col"><?php echo htmlspecialchars($producto['cantidad']); ?></td>
             </tr>
             <?php endforeach; ?>
             <tr class="total-row">
                 <td colspan="2">Total unidades:</td>
-                <td class="text-right"><?php echo $totalUnidades; ?></td>
+                <td class="cantidad-col"><?php echo $totalUnidades; ?></td>
             </tr>
         </tbody>
     </table>
