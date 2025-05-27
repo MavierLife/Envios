@@ -40,17 +40,17 @@ $stmt          = $db->prepare($sql);
 $stmt->execute($codigos);
 $descs         = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
 
-// Armar las líneas tab-delimitadas
+// Armar las líneas para CSV
 $lineas = [];
 foreach ($produccion as $codigo => $cantidad) {
     $cantidad = floatval($cantidad);
-    if ($cantidad <= 0) continue;    // ← ignorar si la cantidad es 0 o negativa
+    if ($cantidad <= 0) continue;    // ignorar si la cantidad es 0 o negativa
     $descripcion = $descs[$codigo] ?? '';
     $lineas[]    = implode("\t", [
         $codigo,
         $descripcion,
         $cantidad,
-        $userName,  // ← aquí usar $userName
+        $userName,
         $fecha
     ]);
 }

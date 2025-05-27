@@ -1,6 +1,7 @@
 <?php
 session_start();
-require_once 'Config/Database.php'; // Agregar conexión a base de datos
+require_once 'Config/Database.php';
+require_once 'Config/Inventario.php';
 
 // --- MOVER CONTEO ANTES DEL GUARDIA AJAX ---
 $csvFiles = glob(__DIR__ . '/ProdPendientes/*.csv');
@@ -23,25 +24,9 @@ foreach ($csvFiles as $file) {
     }
 }
 
-// Leer datos del inventario
-$inventarioPath = __DIR__ . '/Inventario/inventario.csv';
-$inventario = [];
-if (file_exists($inventarioPath) && ($handle = fopen($inventarioPath, 'r')) !== false) {
-    $headers = fgetcsv($handle); // Leer cabecera
-    while (($row = fgetcsv($handle)) !== false) {
-        if (isset($row[0], $row[1], $row[2], $row[3], $row[4])) {
-            $inventario[] = [
-                'codigo' => $row[0],
-                'descripcion' => $row[1],
-                'inventario' => (int)$row[2],
-                'usuario' => $row[3],
-                'fecha' => $row[4]
-            ];
-        }
-    }
-    fclose($handle);
-}
-// ---------------------------------------------
+// Leer datos del inventario con la nueva clase
+$inventarioObj = new Inventario();
+$inventario = $inventarioObj->obtenerProductos();
 
 // --- INICIO DE LA MODIFICACIÓN PARA OPCIÓN 1 ---
 // Si no es una solicitud AJAX Y se accede directamente a este archivo
@@ -142,7 +127,7 @@ if (!isset($_SESSION['user_id'])) {
                                 $codigo = htmlspecialchars($producto['codigo']);
                                 $descripcion = htmlspecialchars($producto['descripcion']);
                                 $cantidad = (int)$producto['inventario'];
-                                $usuario = htmlspecialchars($producto['usuario']);
+                                $usuario = htmlspecialchars($producto['usuarioUpdate']); // Aquí está el cambio
                                 $fecha = htmlspecialchars($producto['fecha']);
                                 
                                 // Determinar clase de tarjeta basada en inventario

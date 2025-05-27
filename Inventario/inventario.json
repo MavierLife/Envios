@@ -1,0 +1,103 @@
+{
+    "productos": [
+        {
+            "codigo": "0003808",
+            "descripcion": "QUALITY FRANCES",
+            "inventario": 10,
+            "usuarioUpdate": "JOSE ANTONIO",
+            "fecha": "2025-05-27 01:59:30"
+        },
+        {
+            "codigo": "0006896",
+            "descripcion": "QUALITY CONCHA GRD",
+            "inventario": 0,
+            "usuarioUpdate": "JOSE ANTONIO",
+            "fecha": "2025-05-23 01:10:24"
+        },
+        {
+            "codigo": "0007039",
+            "descripcion": "QUALITY ALEMANA",
+            "inventario": 0,
+            "usuarioUpdate": "JOSE ANTONIO",
+            "fecha": "2025-05-23 01:10:24"
+        },
+        {
+            "codigo": "0007175",
+            "descripcion": "QUALITY QUESADILLA",
+            "inventario": 0,
+            "usuarioUpdate": "JOSE ANTONIO",
+            "fecha": "2025-05-23 01:27:23"
+        },
+        {
+            "codigo": "0007178",
+            "descripcion": "QUALITY FRANCES GRD",
+            "inventario": 0,
+            "usuarioUpdate": "JOSE ANTONIO",
+            "fecha": "2025-05-23 01:10:24"
+        },
+        {
+            "codigo": "0007179",
+            "descripcion": "QUALITY SALPORA ALMIDON",
+            "inventario": 0,
+            "usuarioUpdate": "JOSE ANTONIO",
+            "fecha": "2025-05-23 01:10:24"
+        },
+        {
+            "codigo": "0007180",
+            "descripcion": "QUALITY GUARACHA",
+            "inventario": 0,
+            "usuarioUpdate": "JOSE ANTONIO",
+            "fecha": "2025-05-23 01:10:24"
+        },
+        {
+            "codigo": "0007183",
+            "descripcion": "QUALITY NEGRITAS",
+            "inventario": 0,
+            "usuarioUpdate": "JOSE ANTONIO",
+            "fecha": "2025-05-23 01:10:24"
+        },
+        {
+            "codigo": "0007184",
+            "descripcion": "QUALITY FRANCES MED",
+            "inventario": 0,
+            "usuarioUpdate": "JOSE ANTONIO",
+            "fecha": "2025-05-23 01:10:24"
+        },
+        {
+            "codigo": "0007210",
+            "descripcion": "QUALITY TORTA CHOCOLATE",
+            "inventario": 0,
+            "usuarioUpdate": "JOSE ANTONIO",
+            "fecha": "2025-05-23 01:37:21"
+        },
+        {
+            "codigo": "0007241",
+            "descripcion": "QUALITY PASTELITO",
+            "inventario": 0,
+            "usuarioUpdate": "JOSE ANTONIO",
+            "fecha": "2025-05-23 01:27:23"
+        },
+        {
+            "codigo": "0007270",
+            "descripcion": "QUALITY CONCHA MEDIANA",
+            "inventario": 0,
+            "usuarioUpdate": "JOSE ANTONIO",
+            "fecha": "2025-05-23 01:10:24"
+        },
+        {
+            "codigo": "0007407",
+            "descripcion": "QUALITY MUFFIN VAINILLA CHISPAS",
+            "inventario": 0,
+            "usuarioUpdate": "JOSE ANTONIO",
+            "fecha": "2025-05-23 01:37:21"
+        },
+        {
+            "codigo": "0007419",
+            "descripcion": "QUALITY MUFFIN CHOCOLATE CHISPAS",
+            "inventario": 0,
+            "usuarioUpdate": "JOSE ANTONIO",
+            "fecha": "2025-05-23 01:10:24"
+        }
+    ],
+    "ultimaActualizacion": "2025-05-27 01:59:30"
+}

@@ -1,5 +1,7 @@
 <?php
 session_start();
+require_once 'Config/Inventario.php';
+
 if (!isset($_SESSION['user_name'])) {
     http_response_code(401);
     echo json_encode(['error'=>'No autorizado']);
@@ -31,63 +33,20 @@ if ($action === 'aceptar') {
         fclose($h);
     }
 
-    // 2) Leer inventario actual
-    $invPath   = __DIR__ . '/Inventario/inventario.csv';
-    $inventory = [];
-    if (($h = fopen($invPath, 'r')) !== false) {
-        $invHeaders = fgetcsv($h);
-        while (($row = fgetcsv($h)) !== false) {
-            $inventory[$row[0]] = [
-                'Descripcion'   => $row[1],
-                'Inventario'    => intval($row[2]),
-                'UsuarioUpdate' => $row[3],
-                'Fecha'         => $row[4],
-            ];
-        }
-        fclose($h);
-    }
-
+    // 2) Actualizar inventario con la nueva clase
+    $inventario = new Inventario();
+    
     // 3) Actualizar cada ítem
     foreach ($productions as $prod) {
         [$code, $desc, $qty] = [$prod[0], $prod[1], intval($prod[2])];
-        if (isset($inventory[$code])) {
-            $inventory[$code]['Inventario']    += $qty;
-            $inventory[$code]['UsuarioUpdate']  = $validator;
-            $inventory[$code]['Fecha']          = $now;
-        } else {
-            // Si no existe, lo agregamos
-            $inventory[$code] = [
-                'Descripcion'   => $desc,
-                'Inventario'    => $qty,
-                'UsuarioUpdate' => $validator,
-                'Fecha'         => $now,
-            ];
-        }
+        
+        $productoActual = $inventario->obtenerProducto($code);
+        $nuevaCantidad = ($productoActual ? $productoActual['inventario'] : 0) + $qty;
+        
+        $inventario->actualizarInventario($code, $nuevaCantidad, $validator, $desc);
     }
 
-    // 4) Volver a escribir el CSV de inventario con bloqueo
-    $h = fopen($invPath, 'c+');
-    if ($h !== false) {
-        if (flock($h, LOCK_EX)) {                // bloqueo exclusivo
-            ftruncate($h, 0);                   // vaciar contenido
-            rewind($h);                         // volver al inicio
-            fputcsv($h, ['CodigoPROD','Descripcion','Inventario','UsuarioUpdate','Fecha']);
-            foreach ($inventory as $code => $info) {
-                fputcsv($h, [
-                    $code,
-                    $info['Descripcion'],
-                    $info['Inventario'],
-                    $info['UsuarioUpdate'],
-                    $info['Fecha'],
-                ]);
-            }
-            fflush($h);                         // asegurar escritura
-            flock($h, LOCK_UN);                // liberar bloqueo
-        }
-        fclose($h);
-    }
-
-    // 5) Eliminar el archivo pendiente
+    // 4) Eliminar el archivo pendiente
     unlink($pendPath);
 
     echo json_encode(['status'=>'ok']);
