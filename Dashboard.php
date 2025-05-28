@@ -3,6 +3,9 @@ session_start();
 require_once 'Config/Database.php';
 require_once 'Config/Inventario.php';
 
+// Configurar zona horaria de El Salvador
+date_default_timezone_set('America/El_Salvador');
+
 // --- MOVER CONTEO ANTES DEL GUARDIA AJAX ---
 $csvFiles = glob(__DIR__ . '/ProdPendientes/*.csv');
 $validacionesPendiente = $csvFiles ? count($csvFiles) : 0;
@@ -170,7 +173,7 @@ if (!isset($_SESSION['user_id'])) {
                                         </span>
                                         <span>
                                             <i class="icon-calendar"></i>
-                                            Fecha: <?php echo date('d/m/Y', strtotime($fecha)); ?>
+                                            Fecha: <?php echo date('d/m/Y g:i A', strtotime($fecha)); ?>
                                         </span>
                                     </div>
                                 </div>

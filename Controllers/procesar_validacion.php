@@ -2,6 +2,9 @@
 session_start();
 require_once '../Config/Inventario.php';
 
+// Configurar zona horaria de El Salvador
+date_default_timezone_set('America/El_Salvador');
+
 if (!isset($_SESSION['user_name'])) {
     http_response_code(401);
     echo json_encode(['error'=>'No autorizado']);
@@ -20,7 +23,7 @@ if ($action === 'aceptar') {
     }
 
     $validator = $_SESSION['user_name'];
-    $now       = date('Y-m-d H:i:s');
+    $now = date('Y-m-d H:i:s');
 
     // 1) Leer producciones pendientes
     $productions = [];

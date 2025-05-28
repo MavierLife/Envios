@@ -2,6 +2,9 @@
 session_start();
 require_once 'Config/Database.php';
 
+// Configurar zona horaria de El Salvador
+date_default_timezone_set('America/El_Salvador');
+
 // --- INICIO DE LA SECCIÓN PARA EVITAR CARGA DIRECTA SIN ESTILOS ---
 // Si no es una solicitud AJAX Y se accede directamente a este archivo
 if (empty($_SERVER['HTTP_X_REQUESTED_WITH'])
@@ -64,7 +67,7 @@ $csvFiles = glob(__DIR__ . '/ProdPendientes/*.csv');
                                 $file = htmlspecialchars(basename($csv));
                                 $fileSize = filesize($csv);
                                 $fileSizeFormatted = $fileSize > 1024 ? round($fileSize/1024, 1) . ' KB' : $fileSize . ' B';
-                                $fileDate = date('d/m/Y H:i', filemtime($csv));
+                                $fileDate = date('d/m/Y g:i A', filemtime($csv));
                             ?>
                             <div class="production-item" data-file="<?php echo $file; ?>">
                                 <div class="production-header">

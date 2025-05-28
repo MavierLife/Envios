@@ -30,7 +30,7 @@ try {
 
     if ($db) {
         // Consulta para obtener los productos que contienen "Quality" en la descripción
-        $query = "SELECT CodigoPROD, Descripcion, Unidades
+        $query = "SELECT CodigoPROD, Descripcion, Unidades, PrecioCosto
                   FROM tblcatalogodeproductos
                   WHERE Descripcion LIKE :searchTerm
                   ORDER BY CodigoPROD ASC";

@@ -3,6 +3,9 @@ session_start();
 require_once '../Config/Database.php';
 require_once '../Config/Inventario.php';
 
+// Configurar zona horaria de El Salvador
+date_default_timezone_set('America/El_Salvador');
+
 if (!isset($_SESSION['user_id'])) {
     http_response_code(401);
     echo json_encode(['error' => 'No autorizado']);

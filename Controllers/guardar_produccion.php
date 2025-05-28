@@ -2,6 +2,9 @@
 session_start();
 require_once '../Config/Database.php';
 
+// Configurar zona horaria de El Salvador
+date_default_timezone_set('America/El_Salvador');
+
 if (!isset($_SESSION['user_id'])) {
     http_response_code(401);
     echo json_encode([
@@ -32,27 +35,23 @@ if (!$db) {
     exit;
 }
 
-// Obtener descripciones de los productos
+// Obtener descripciones y precios de los productos
 $codigos       = array_keys($produccion);
 $placeholders  = implode(',', array_fill(0, count($codigos), '?'));
-$sql           = "SELECT CodigoPROD, Descripcion FROM tblcatalogodeproductos WHERE CodigoPROD IN ($placeholders)";
+$sql           = "SELECT CodigoPROD, Descripcion, PrecioCosto, Unidades FROM tblcatalogodeproductos WHERE CodigoPROD IN ($placeholders)";
 $stmt          = $db->prepare($sql);
 $stmt->execute($codigos);
-$descs         = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+$productos     = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Armar las líneas para CSV
-$lineas = [];
-foreach ($produccion as $codigo => $cantidad) {
-    $cantidad = floatval($cantidad);
-    if ($cantidad <= 0) continue;    // ignorar si la cantidad es 0 o negativa
-    $descripcion = $descs[$codigo] ?? '';
-    $lineas[]    = implode("\t", [
-        $codigo,
-        $descripcion,
-        $cantidad,
-        $userName,
-        $fecha
-    ]);
+// Crear arrays asociativos para fácil acceso
+$descs = [];
+$precios = [];
+foreach ($productos as $producto) {
+    $descs[$producto['CodigoPROD']] = $producto['Descripcion'];
+    $unidades = (float)$producto['Unidades'];
+    $precioCosto = (float)$producto['PrecioCosto'];
+    // Calcular precio por unidad
+    $precios[$producto['CodigoPROD']] = $unidades > 0 ? ($precioCosto / $unidades) : 0;
 }
 
 // Directorio y nombre de archivo .csv
@@ -65,19 +64,21 @@ $rutaFile = $dir . DIRECTORY_SEPARATOR . $nombre;
 
 // Crear y escribir CSV
 $fp = fopen($rutaFile, 'w');
-// Cabecera
-fputcsv($fp, ['CodigoPROD','Descripcion','Produccion','Usuario','Fecha']);
+// Cabecera - agregar PrecioUnidad
+fputcsv($fp, ['CodigoPROD','Descripcion','Produccion','Usuario','Fecha','PrecioUnidad']);
 // Filas de datos
 foreach ($produccion as $codigo => $cantidad) {
     $cantidad = floatval($cantidad);
     if ($cantidad <= 0) continue;
     $descripcion = $descs[$codigo] ?? '';
+    $precioUnidad = $precios[$codigo] ?? 0;
     fputcsv($fp, [
         $codigo,
         $descripcion,
         $cantidad,
         $userName,
-        $fecha
+        $fecha,
+        number_format($precioUnidad, 2)
     ]);
 }
 fclose($fp);

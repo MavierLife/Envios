@@ -2,6 +2,9 @@
 session_start();
 require_once 'Config/Database.php';
 
+// Configurar zona horaria de El Salvador
+date_default_timezone_set('America/El_Salvador');
+
 // Detectar si es producción o envío
 $file = isset($_GET['file']) ? basename($_GET['file']) : null;
 $tipo = isset($_GET['tipo']) ? $_GET['tipo'] : 'produccion'; // 'produccion' o 'envio'
@@ -78,13 +81,19 @@ if ($tipo === 'envio') {
         $prodIndex = array_search('Produccion', $headers);
         $userIndex = array_search('Usuario', $headers);
         $dateIndex = array_search('Fecha', $headers);
+        $precioIndex = array_search('PrecioUnidad', $headers);
         
         // Leer datos
         while (($data = fgetcsv($handle)) !== false) {
+            $cantidad = (int)$data[$prodIndex];
+            $precioUnidad = isset($data[$precioIndex]) ? (float)$data[$precioIndex] : 0;
+            
             $productos[] = [
                 'codigo' => $data[$codIndex],
                 'descripcion' => $data[$descIndex],
-                'cantidad' => $data[$prodIndex]
+                'cantidad' => $cantidad,
+                'precio_unidad' => $precioUnidad,
+                'subtotal' => $cantidad * $precioUnidad
             ];
             
             // Guardar usuario y fecha (tomamos los del primer registro)
@@ -93,14 +102,14 @@ if ($tipo === 'envio') {
                 $fecha = $data[$dateIndex];
             }
             
-            $totalUnidades += (int)$data[$prodIndex];
+            $totalUnidades += $cantidad;
         }
         fclose($handle);
     }
 }
 
-// Formatear fecha para mostrar
-$fechaFormateada = date('d/m/Y H:i', strtotime($fecha));
+// Formatear fecha para mostrar en formato 12 horas
+$fechaFormateada = date('d/m/Y g:i A', strtotime($fecha));
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -179,7 +188,29 @@ $fechaFormateada = date('d/m/Y H:i', strtotime($fecha));
         
         .text-right {
             text-align: right;
-            padding-right: 5mm;
+            padding-right: 2mm;
+            padding-left: 2.5mm; /* Reducir de 5mm a 2.5mm para mover hacia el centro */
+        }
+        
+        .precio-col {
+            min-width: 12mm;
+            text-align: right;
+            padding-right: 2mm;
+            padding-left: 5mm; /* Añadir padding izquierdo para centrar */
+        }
+        
+        .subtotal-col {
+            min-width: 15mm;
+            text-align: right;
+            font-weight: bold;
+            padding-right: 2mm;
+            padding-left: 0mm; /* Reducir de 5mm a 0mm para mover hacia el centro */
+        }
+        
+        .ticket-table th.text-right {
+            text-align: right;
+            padding-right: 2mm;
+            padding-left: 5mm; /* Añadir padding izquierdo para centrar los encabezados */
         }
         
         .text-center {
@@ -238,28 +269,41 @@ $fechaFormateada = date('d/m/Y H:i', strtotime($fecha));
     <table class="ticket-table">
         <thead>
             <tr>
-                <th>Código</th>
                 <th>Producto</th>
                 <th class="cantidad-col"><?php echo $tipo === 'envio' ? 'Env.' : 'Cant.'; ?></th>
-                <?php if ($tipo === 'envio'): ?>
+                <?php if ($tipo === 'produccion'): ?>
+                <th class="text-right">P.Unit</th>
+                <th class="text-right">Subtotal</th>
+                <?php elseif ($tipo === 'envio'): ?>
                 <th class="cantidad-col">Stock</th>
                 <?php endif; ?>
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($productos as $producto): ?>
+            <?php 
+            $totalValor = 0;
+            foreach ($productos as $producto): 
+                if ($tipo === 'produccion') {
+                    $totalValor += $producto['subtotal'];
+                }
+            ?>
             <tr>
-                <td><?php echo htmlspecialchars($producto['codigo']); ?></td>
                 <td><?php echo htmlspecialchars($producto['descripcion']); ?></td>
                 <td class="cantidad-col"><?php echo htmlspecialchars($producto['cantidad']); ?></td>
-                <?php if ($tipo === 'envio'): ?>
+                <?php if ($tipo === 'produccion'): ?>
+                <td class="text-right">$<?php echo number_format($producto['precio_unidad'], 2); ?></td>
+                <td class="text-right">$<?php echo number_format($producto['subtotal'], 2); ?></td>
+                <?php elseif ($tipo === 'envio'): ?>
                 <td class="cantidad-col"><?php echo htmlspecialchars($producto['existencia_nueva']); ?></td>
                 <?php endif; ?>
             </tr>
             <?php endforeach; ?>
             <tr class="total-row">
-                <td colspan="<?php echo $tipo === 'envio' ? '3' : '2'; ?>">Total <?php echo $tipo === 'envio' ? 'enviado' : 'unidades'; ?>:</td>
+                <td colspan="<?php echo $tipo === 'envio' ? '2' : ($tipo === 'produccion' ? '2' : '1'); ?>">Total <?php echo $tipo === 'envio' ? 'enviado' : 'unidades'; ?>:</td>
                 <td class="cantidad-col"><?php echo $totalUnidades; ?></td>
+                <?php if ($tipo === 'produccion'): ?>
+                <td class="text-right"><strong>$<?php echo number_format($totalValor, 2); ?></strong></td>
+                <?php endif; ?>
             </tr>
         </tbody>
     </table>
