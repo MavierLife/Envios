@@ -17,9 +17,9 @@
         {
             "codigo": "0007039",
             "descripcion": "QUALITY ALEMANA",
-            "inventario": 20,
+            "inventario": 5,
             "usuarioUpdate": "JOSE ANTONIO",
-            "fecha": "2025-05-27 19:25:08"
+            "fecha": "2025-05-27 20:38:30"
         },
         {
             "codigo": "0007175",
@@ -99,5 +99,5 @@
             "fecha": "2025-05-23 01:10:24"
         }
     ],
-    "ultimaActualizacion": "2025-05-27 19:25:08"
+    "ultimaActualizacion": "2025-05-27 20:38:30"
 }
