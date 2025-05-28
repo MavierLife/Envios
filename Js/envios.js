@@ -19,18 +19,57 @@ function configurarSelectorTienda() {
         const tiendaUUID = $(this).val();
         const nombreTienda = $(this).find('option:selected').text();
         
+        // LIMPIAR TODO antes de cargar nueva tienda
+        limpiarSeleccionTienda();
+        
         if (tiendaUUID) {
             $('#tiendaSeleccionada').val(tiendaUUID);
             cargarProductosTienda(tiendaUUID, nombreTienda);
         } else {
             $('#productosContainer').hide();
-            $('#productosGrid').empty();
         }
     });
 }
 
+// Nueva función para limpiar completamente la selección de tienda
+function limpiarSeleccionTienda() {
+    // Ocultar contenedor de productos
+    $('#productosContainer').hide();
+    
+    // Limpiar grid de productos
+    $('#productosGrid').empty();
+    
+    // Limpiar información de tienda anterior
+    $('.tienda-info').remove();
+    
+    // Resetear contadores
+    $('#contadorProductos').text('0');
+    $('#conteoEnvio').text('0');
+    
+    // Ocultar footer
+    $('#formFooter').hide();
+    
+    // Limpiar campo oculto
+    $('#tiendaSeleccionada').val('');
+    
+    // Limpiar búsqueda
+    $('#buscarProducto').val('');
+    
+    // Resetear variables globales
+    productosDisponibles = [];
+    inventarioActual = [];
+    elementoLanzadorActualParaModal = null;
+    
+    // Cerrar modal si está abierto
+    $('#envioModal').modal('hide');
+}
+
 // Cargar productos de la tienda seleccionada
 function cargarProductosTienda(tiendaUUID, nombreTienda) {
+    // Asegurar que esté limpio antes de mostrar loading
+    $('#productosGrid').empty();
+    $('.tienda-info').remove();
+    
     mostrarCargando();
     
     $.ajax({
@@ -39,6 +78,10 @@ function cargarProductosTienda(tiendaUUID, nombreTienda) {
         data: { tienda_uuid: tiendaUUID },
         dataType: 'json',
         success: function(response) {
+            // Limpiar de nuevo por si acaso
+            $('#productosGrid').empty();
+            $('.tienda-info').remove();
+            
             if (response.status === 'ok') {
                 productosDisponibles = response.productos;
                 inventarioActual = response.inventario;
@@ -417,43 +460,69 @@ function procesarEnvio() {
         processData: false,
         contentType: false,
         success: function(response) {
+            console.log('Respuesta del servidor:', response); // Para debug
+            
             try {
                 const data = JSON.parse(response);
+                console.log('Datos parseados:', data); // Para debug
                 
                 if (data.status === 'ok') {
                     Swal.fire({
                         icon: 'success',
                         title: '¡Éxito!',
                         text: 'El envío se procesó correctamente',
-                        confirmButtonColor: '#007bff'
-                    }).then(() => {
+                        confirmButtonColor: '#007bff',
+                        confirmButtonText: 'Ver Ticket'
+                    }).then((result) => {
+                        // Abrir ticket de envío en nueva ventana
+                        if (data.archivo) {
+                            console.log('Abriendo ticket con archivo:', data.archivo); // Para debug
+                            const ticketUrl = 'generar_ticket.php?file=' + encodeURIComponent(data.archivo) + '&tipo=envio&autoprint=true';
+                            console.log('URL del ticket:', ticketUrl); // Para debug
+                            window.open(ticketUrl, '_blank');
+                        } else {
+                            console.error('No se recibió el nombre del archivo');
+                        }
+                        
+                        // Limpiar formulario
                         limpiarFormularioEnvio();
                     });
                 } else {
                     mostrarError('Error al procesar: ' + (data.message || 'Error desconocido'));
                 }
             } catch(e) {
+                console.error('Error al parsear JSON:', e);
+                console.error('Respuesta recibida:', response);
                 mostrarError('Error en la respuesta del servidor');
             }
         },
-        error: function() {
+        error: function(xhr, status, error) {
+            console.error('Error AJAX:', status, error);
             mostrarError('Error de conexión al procesar el envío');
         }
     });
 }
 
-// Limpiar formulario
+// Función para mostrar errores (asegúrate de que exista)
+function mostrarError(mensaje) {
+    Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: mensaje,
+        confirmButtonColor: '#dc3545'
+    });
+}
+
+// Función para limpiar formulario (asegúrate de que exista)
 function limpiarFormularioEnvio() {
-    $('.envio-hidden-input').val(0);
-    $('.display-envio').text(0);
-    $('.envio-badge').addClass('zero');
-    $('.product-card').removeClass('has-envio');
+    // Resetear el formulario
+    $('#formEnvios')[0].reset();
+    
+    // Limpiar selector de tienda
     $('#selectTienda').val('');
-    $('#productosContainer').hide();
-    $('#productosGrid').empty();
-    $('.tienda-info').remove();
-    actualizarTotalEnvio();
-    mostrarExito('Formulario limpiado correctamente');
+    
+    // Limpiar todo el contenedor
+    limpiarSeleccionTienda();
 }
 
 // Funciones de utilidad
@@ -472,15 +541,6 @@ function mostrarExito(mensaje) {
         text: mensaje,
         timer: 3000,
         showConfirmButton: false
-    });
-}
-
-function mostrarError(mensaje) {
-    Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: mensaje,
-        confirmButtonColor: '#dc3545'
     });
 }
 

@@ -3,23 +3,23 @@
         {
             "codigo": "0003808",
             "descripcion": "QUALITY FRANCES",
-            "inventario": 30,
+            "inventario": 5,
             "usuarioUpdate": "JOSE ANTONIO",
-            "fecha": "2025-05-27 19:25:08"
+            "fecha": "2025-05-28 02:35:20"
         },
         {
             "codigo": "0006896",
             "descripcion": "QUALITY CONCHA GRD",
-            "inventario": 50,
+            "inventario": 0,
             "usuarioUpdate": "JOSE ANTONIO",
-            "fecha": "2025-05-27 17:20:27"
+            "fecha": "2025-05-28 02:37:16"
         },
         {
             "codigo": "0007039",
             "descripcion": "QUALITY ALEMANA",
-            "inventario": 5,
+            "inventario": 0,
             "usuarioUpdate": "JOSE ANTONIO",
-            "fecha": "2025-05-27 20:38:30"
+            "fecha": "2025-05-28 02:29:46"
         },
         {
             "codigo": "0007175",
@@ -52,9 +52,9 @@
         {
             "codigo": "0007183",
             "descripcion": "QUALITY NEGRITAS",
-            "inventario": 10,
+            "inventario": 0,
             "usuarioUpdate": "JOSE ANTONIO",
-            "fecha": "2025-05-27 18:59:17"
+            "fecha": "2025-05-28 02:37:16"
         },
         {
             "codigo": "0007184",
@@ -99,5 +99,5 @@
             "fecha": "2025-05-23 01:10:24"
         }
     ],
-    "ultimaActualizacion": "2025-05-27 20:38:30"
+    "ultimaActualizacion": "2025-05-28 02:37:16"
 }

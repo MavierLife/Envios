@@ -148,6 +148,10 @@ try {
     
     fclose($fp);
     
+    // Debug: verificar que el archivo se creó
+    error_log("Archivo creado: " . $archivoEnvio);
+    error_log("Archivo base: " . basename($archivoEnvio));
+    
     echo json_encode([
         'status' => 'ok',
         'message' => 'Envío procesado correctamente',
