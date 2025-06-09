@@ -49,8 +49,14 @@ if ($action === 'aceptar') {
         $inventario->actualizarInventario($code, $nuevaCantidad, $validator, $desc);
     }
 
-    // 4) Eliminar el archivo pendiente
-    unlink($pendPath);
+    // 4) Mover archivo a carpeta de validados en lugar de eliminarlo
+    $validatedDir = dirname(__DIR__) . '/ProdValidadas';
+    if (!is_dir($validatedDir)) {
+        mkdir($validatedDir, 0755, true);
+    }
+    
+    $validatedPath = $validatedDir . '/' . $file;
+    rename($pendPath, $validatedPath);
 
     echo json_encode(['status'=>'ok']);
     exit;

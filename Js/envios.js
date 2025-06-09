@@ -314,7 +314,8 @@ function configurarModalEnvio() {
             // Cerrar modal
             $('#envioModal').modal('hide');
             
-            mostrarExito('Envío actualizado correctamente');
+            // REMOVER ESTA LÍNEA:
+            // mostrarExito('Envío actualizado correctamente');
         }, 300);
     });
 }

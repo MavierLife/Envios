@@ -3,101 +3,101 @@
         {
             "codigo": "0003808",
             "descripcion": "QUALITY FRANCES",
-            "inventario": 90,
+            "inventario": 0,
             "usuarioUpdate": "JOSE ANTONIO",
-            "fecha": "2025-05-28 08:12:17"
+            "fecha": "2025-06-09 15:14:49"
         },
         {
             "codigo": "0006896",
             "descripcion": "QUALITY CONCHA GRD",
-            "inventario": 90,
+            "inventario": 0,
             "usuarioUpdate": "JOSE ANTONIO",
-            "fecha": "2025-05-28 08:12:17"
+            "fecha": "2025-06-09 15:14:49"
         },
         {
             "codigo": "0007039",
             "descripcion": "QUALITY ALEMANA",
-            "inventario": 90,
+            "inventario": 0,
             "usuarioUpdate": "JOSE ANTONIO",
-            "fecha": "2025-05-28 08:12:17"
+            "fecha": "2025-06-09 15:14:49"
         },
         {
             "codigo": "0007175",
             "descripcion": "QUALITY QUESADILLA",
-            "inventario": 100,
+            "inventario": 0,
             "usuarioUpdate": "JOSE ANTONIO",
-            "fecha": "2025-05-28 08:11:23"
+            "fecha": "2025-06-08 11:59:39"
         },
         {
             "codigo": "0007178",
             "descripcion": "QUALITY FRANCES GRD",
-            "inventario": 100,
+            "inventario": 0,
             "usuarioUpdate": "JOSE ANTONIO",
             "fecha": "2025-05-28 08:11:23"
         },
         {
             "codigo": "0007179",
             "descripcion": "QUALITY SALPORA ALMIDON",
-            "inventario": 100,
+            "inventario": 0,
             "usuarioUpdate": "JOSE ANTONIO",
-            "fecha": "2025-05-28 08:11:23"
+            "fecha": "2025-05-28 16:54:11"
         },
         {
             "codigo": "0007180",
             "descripcion": "QUALITY GUARACHA",
-            "inventario": 100,
+            "inventario": 0,
             "usuarioUpdate": "JOSE ANTONIO",
-            "fecha": "2025-05-28 08:11:23"
+            "fecha": "2025-06-04 17:22:12"
         },
         {
             "codigo": "0007183",
             "descripcion": "QUALITY NEGRITAS",
-            "inventario": 100,
-            "usuarioUpdate": "JOSE ANTONIO",
-            "fecha": "2025-05-28 08:11:23"
+            "inventario": 10,
+            "usuarioUpdate": "0001",
+            "fecha": "2025-06-09 15:38:37"
         },
         {
             "codigo": "0007184",
             "descripcion": "QUALITY FRANCES MED",
-            "inventario": 100,
+            "inventario": 0,
             "usuarioUpdate": "JOSE ANTONIO",
             "fecha": "2025-05-28 08:11:23"
         },
         {
             "codigo": "0007210",
             "descripcion": "QUALITY TORTA CHOCOLATE",
-            "inventario": 100,
+            "inventario": 0,
             "usuarioUpdate": "JOSE ANTONIO",
             "fecha": "2025-05-28 08:11:23"
         },
         {
             "codigo": "0007241",
             "descripcion": "QUALITY PASTELITO",
-            "inventario": 100,
+            "inventario": 0,
             "usuarioUpdate": "JOSE ANTONIO",
-            "fecha": "2025-05-28 08:11:23"
+            "fecha": "2025-06-09 15:14:49"
         },
         {
             "codigo": "0007270",
             "descripcion": "QUALITY CONCHA MEDIANA",
-            "inventario": 90,
+            "inventario": 0,
             "usuarioUpdate": "JOSE ANTONIO",
             "fecha": "2025-05-28 08:12:17"
         },
         {
             "codigo": "0007407",
             "descripcion": "QUALITY MUFFIN VAINILLA CHISPAS",
-            "inventario": 100,
+            "inventario": 0,
             "usuarioUpdate": "JOSE ANTONIO",
-            "fecha": "2025-05-28 08:11:23"
+            "fecha": "2025-06-04 17:22:12"
         },
         {
             "codigo": "0007419",
             "descripcion": "QUALITY MUFFIN CHOCOLATE CHISPAS",
-            "inventario": 100,
+            "inventario": 0,
             "usuarioUpdate": "JOSE ANTONIO",
-            "fecha": "2025-05-28 08:11:23"
+            "fecha": "2025-06-09 15:14:49"
         }
     ],
-    "ultimaActualizacion": "2025-05-28 08:12:17"
+    "ultimaActualizacion": "2025-06-09 15:38:37"
 }
