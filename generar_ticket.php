@@ -8,6 +8,7 @@ date_default_timezone_set('America/El_Salvador');
 // Detectar si es producción o envío
 $file = isset($_GET['file']) ? basename($_GET['file']) : null;
 $tipo = isset($_GET['tipo']) ? $_GET['tipo'] : 'produccion'; // 'produccion' o 'envio'
+$carpeta = isset($_GET['carpeta']) ? $_GET['carpeta'] : 'ProdPendientes'; // carpeta por defecto
 
 if (!$file) {
     echo "<h3>Archivo no especificado</h3>";
@@ -64,10 +65,10 @@ if ($tipo === 'envio') {
         fclose($handle);
     }
 } else {
-    // Manejar archivos de producción (código original)
-    $filePath = __DIR__ . '/ProdPendientes/' . $file;
+    // Manejar archivos de producción usando la carpeta especificada
+    $filePath = __DIR__ . '/' . $carpeta . '/' . $file;
     if (!file_exists($filePath)) {
-        echo "<h3>Archivo de producción no encontrado</h3>";
+        echo "<h3>Archivo de producción no encontrado en carpeta: " . $carpeta . "</h3>";
         exit;
     }
 

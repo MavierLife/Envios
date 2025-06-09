@@ -230,7 +230,13 @@ if (!isset($_SESSION['user_acceso']) || $_SESSION['user_acceso'] !== 'admin') {
               <i class="icon-check"></i><span>Validación</span>
             </a>
           </li>
-          <li class="nav-item"><a class="nav-link" href="#Envios"><i class="icon-truck"></i><span>Envíos a Tiendas</span></a></li>
+          <li class="nav-item">
+            <a class="nav-link" href="#Reinprecion">
+              <i class="icon-undo2"></i><span>Reinpresión</span>
+            </a>
+          </li>
+          <li class="nav-item"><a class="nav-link" href="#Envios"><i class="icon-truck"></i><span>Envíos a Tiendas</span></a>
+          </li>
           <li class="nav-item"><a class="nav-link" href="#creditos"><i class="icon-credit-card"></i><span>CREDITOS</span></a></li>
           <li class="nav-item"><a class="nav-link" href="#inventario"><i class="icon-archive"></i><span>INVENTARIO</span></a></li>
           <li class="nav-item"><a class="nav-link" href="#clientes"><i class="icon-users"></i><span>CLIENTES</span></a></li>
