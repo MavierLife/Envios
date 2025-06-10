@@ -58,6 +58,11 @@ if (!isset($_SESSION['user_acceso']) || $_SESSION['user_acceso'] !== 'admin') {
     }
     .navbar-fixed-top .nav > li > a i { line-height: var(--navbar-height); }
 
+    .navbar-fixed-top .container-fluid { /* Asegurar que no haya padding vertical no deseado */
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+
     .main { display: flex; flex: 1; overflow: hidden; }
 
     .sidebar {
@@ -237,11 +242,9 @@ if (!isset($_SESSION['user_acceso']) || $_SESSION['user_acceso'] !== 'admin') {
           </li>
           <li class="nav-item"><a class="nav-link" href="#Envios"><i class="icon-truck"></i><span>Envíos a Tiendas</span></a>
           </li>
-          <li class="nav-item"><a class="nav-link" href="#creditos"><i class="icon-credit-card"></i><span>CREDITOS</span></a></li>
+          
           <li class="nav-item"><a class="nav-link" href="#inventario"><i class="icon-archive"></i><span>INVENTARIO</span></a></li>
-          <li class="nav-item"><a class="nav-link" href="#clientes"><i class="icon-users"></i><span>CLIENTES</span></a></li>
-          <li class="nav-item"><a class="nav-link" href="#configuracion"><i class="icon-cogs"></i><span>Configuración</span></a></li>
-          <li class="nav-item"><a class="nav-link" href="#ayuda"><i class="icon-question3"></i><span>AYUDA</span></a></li>
+          
         </ul>
       </nav>
 
