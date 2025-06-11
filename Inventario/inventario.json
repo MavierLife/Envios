@@ -97,7 +97,14 @@
             "inventario": 0,
             "usuarioUpdate": "JOSE ANTONIO",
             "fecha": "2025-06-09 15:14:49"
+        },
+        {
+            "codigo": "0007445",
+            "descripcion": "QUALITY MUFF VAINILLA BIG BITE",
+            "inventario": 0,
+            "usuarioUpdate": "0220",
+            "fecha": "2025-06-11 07:51:42"
         }
     ],
-    "ultimaActualizacion": "2025-06-09 15:38:37"
+    "ultimaActualizacion": "2025-06-11 07:51:42"
 }

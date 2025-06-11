@@ -31,6 +31,61 @@ foreach ($csvFiles as $file) {
 $inventarioObj = new Inventario();
 $inventario = $inventarioObj->obtenerProductos();
 
+// --- OBTENER NOMBRES DE PRODUCTOS DESDE LA BASE DE DATOS ---
+$inventarioConNombres = [];
+if (!empty($inventario)) {
+    try {
+        $database = new Database();
+        $db = $database->getConnection();
+        
+        if ($db) {
+            // Obtener todos los códigos del inventario
+            $codigos = array_column($inventario, 'codigo');
+            
+            if (!empty($codigos)) {
+                // Crear placeholders para la consulta
+                $placeholders = implode(',', array_fill(0, count($codigos), '?'));
+                
+                // Consultar las descripciones desde la base de datos
+                $query = "SELECT CodigoPROD, Descripcion 
+                         FROM tblcatalogodeproductos 
+                         WHERE CodigoPROD IN ($placeholders)";
+                
+                $stmt = $db->prepare($query);
+                $stmt->execute($codigos);
+                $productosDB = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                
+                // Crear array asociativo para búsqueda rápida
+                $descripcionesDB = [];
+                foreach ($productosDB as $producto) {
+                    $descripcionesDB[$producto['CodigoPROD']] = $producto['Descripcion'];
+                }
+                
+                // Combinar datos del inventario con descripciones de la BD
+                foreach ($inventario as $item) {
+                    $codigo = $item['codigo'];
+                    $inventarioConNombres[] = [
+                        'codigo' => $codigo,
+                        'descripcion' => $descripcionesDB[$codigo] ?? $item['descripcion'], // Usar BD o fallback al JSON
+                        'inventario' => $item['inventario'],
+                        'usuarioUpdate' => $item['usuarioUpdate'],
+                        'fecha' => $item['fecha']
+                    ];
+                }
+            }
+        } else {
+            // Si no hay conexión, usar datos del JSON
+            $inventarioConNombres = $inventario;
+        }
+    } catch (Exception $e) {
+        // En caso de error, usar datos del JSON
+        error_log("Error al obtener descripciones de productos: " . $e->getMessage());
+        $inventarioConNombres = $inventario;
+    }
+} else {
+    $inventarioConNombres = $inventario;
+}
+
 // --- INICIO DE LA MODIFICACIÓN PARA OPCIÓN 1 ---
 // Si no es una solicitud AJAX Y se accede directamente a este archivo
 if (empty($_SERVER['HTTP_X_REQUESTED_WITH'])
@@ -110,15 +165,15 @@ if (!isset($_SESSION['user_id'])) {
                 <div class="panel-heading">
                     <h3 class="panel-title">
                         <i class="icon-archive"></i> Inventario Actual
-                        <?php if (!empty($inventario)): ?>
+                        <?php if (!empty($inventarioConNombres)): ?>
                             <span style="background: rgba(255,255,255,0.2); padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.8rem; margin-left: 0.5rem;">
-                                <?php echo count($inventario); ?> productos
+                                <?php echo count($inventarioConNombres); ?> productos
                             </span>
                         <?php endif; ?>
                     </h3>
                 </div>
                 <div class="panel-body">
-                    <?php if (empty($inventario)): ?>
+                    <?php if (empty($inventarioConNombres)): ?>
                         <div class="alert alert-info">
                             <i class="icon-info" style="margin-right: 0.5rem;"></i>
                             <strong>Sin productos en inventario</strong><br>
@@ -126,11 +181,11 @@ if (!isset($_SESSION['user_id'])) {
                         </div>
                     <?php else: ?>
                         <div class="products-grid">
-                            <?php foreach ($inventario as $producto): 
+                            <?php foreach ($inventarioConNombres as $producto): 
                                 $codigo = htmlspecialchars($producto['codigo']);
                                 $descripcion = htmlspecialchars($producto['descripcion']);
                                 $cantidad = (int)$producto['inventario'];
-                                $usuario = htmlspecialchars($producto['usuarioUpdate']); // Aquí está el cambio
+                                $usuario = htmlspecialchars($producto['usuarioUpdate']);
                                 $fecha = htmlspecialchars($producto['fecha']);
                                 
                                 // Determinar clase de tarjeta basada en inventario
